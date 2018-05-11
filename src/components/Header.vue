@@ -1,0 +1,96 @@
+<template>
+  <div id="header">
+    <b-navbar class="blog-nav bg-white" toggleable="md" type="light">
+
+      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+
+      <b-navbar-brand class="font-weight-bold ml-5">
+        <router-link to="/">{{title}}</router-link>
+      </b-navbar-brand>
+
+      <b-collapse is-nav id="nav_collapse">
+
+        <b-navbar-nav class="ml-auto mr-5">
+          <b-nav-item class="mr-4">
+            <router-link to="/">
+              <a class="nav-item">首&nbsp&nbsp&nbsp&nbsp页</a>
+            </router-link>
+          </b-nav-item>
+          <b-nav-item-dropdown class="mr-4">
+            <template slot="button-content">
+              <a class="nav-item">分&nbsp&nbsp&nbsp&nbsp类</a>
+            </template>
+            <b-dropdown-item href="#" v-for="category in categorys" :key="category.id">{{category.item}}</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <b-nav-item href="#" class="mr-4"><a class="nav-item">归&nbsp&nbsp&nbsp&nbsp档</a></b-nav-item>
+          <b-nav-item class="mr-5">
+            <router-link to="/helloworld/">
+              <a class="nav-item">关&nbsp&nbsp&nbsp&nbsp于</a>
+            </router-link>
+          </b-nav-item>
+          <b-nav-form>
+            <b-form-input size="sm" class="mr-sm-2 search-input" type="text" v-model="searchWord" placeholder="Search"/>
+            <b-button variant="outline-primary" size="sm"
+                      class="my-2 my-sm-0" type="submit"
+                      @click="search" >搜 索</b-button>
+          </b-nav-form>
+        </b-navbar-nav>
+
+      </b-collapse>
+    </b-navbar>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: 'Header',
+    data () {
+      return {
+        title: "袁方的博客",
+        categorys:[],
+        searchWord:'',
+      }
+    },
+    methods: {
+      getCategorys() {
+        this.categorys = [
+          {id: 0, item: 'Python 基础', nums:0},
+          {id: 1, item: 'Django 学习', nums:0},
+          {id: 2, item: 'Opencv 学习', nums:0},
+        ]
+      },
+      search() {
+        console.log('search click');
+        this.$emit('search', this.searchWord)
+      }
+    },
+    mounted() {
+      this.getCategorys()
+    }
+  }
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style lang="scss" scoped>
+@import '../assets/css/pink-style.scss';
+a {
+  color: inherit;
+  text-decoration: none;
+}
+/*导航栏下边框阴影*/
+.blog-nav {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.05);
+}
+/*导航栏item渐变样式*/
+.nav-link>a {
+  color: #000;
+  transition:all 0.05s;
+}
+.nav-link>a:hover {
+  color: $pink;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  border: none;
+}
+</style>

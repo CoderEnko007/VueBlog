@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <router-view/>
   </div>
 </template>
@@ -11,13 +10,14 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+  @import '../scss/custom.scss';
+  @import '../node_modules/bootstrap/scss/bootstrap.scss';
+  body,div,ol,ul,li,dl,dt,dd,h1,h2,h3,h4,h5,h6,p,form,fieldset,legend,input{ margin:0; padding:0;}
+  ol,ul{ list-style:none;}
+  img,fieldset{ border:0 none; display:block;}
+  html, body, #app {height: 100%;}
+  body {
+    background-color: $bgcolor;
+  }
 </style>
