@@ -13,13 +13,23 @@ export default new Router({
       path: '/',
       name: 'blog',
       component: Blog,
+      redirect: { name: 'index'},
       children: [
         {
-          path: 'list/',
-          name: 'list',
+          path: 'index/',
+          name: 'index',
           component: BlogList,
           meta: {
             title: '博客列表',
+            need_log: false
+          }
+        },
+        {
+          path: 'posts/:id',
+          name: 'posts',
+          component: Article,
+          meta: {
+            title: '文章正文',
             need_log: false
           }
         },
@@ -44,18 +54,9 @@ export default new Router({
       ]
     },
     {
-      path: 'posts/:id',
-      name: 'posts',
-      component: Article,
-      meta: {
-        title: '文章正文',
-        need_log: false
-      }
-    },
-    {
       path: '/helloworld',
       name: 'HelloWorld',
-      component: Article
+      component: HelloWorld
     }
   ]
 })

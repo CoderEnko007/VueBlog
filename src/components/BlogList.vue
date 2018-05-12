@@ -1,44 +1,55 @@
 <template>
 <div class="blog-list">
-  <div class="block mb-1 mb-sm-2 p-2 p-lg-3" v-for="post in listData">
-    <h2 class="title mb-4">{{post.title}}</h2>
-    <div class="post-meta mb-4">
-      <b-img class="d-inline-block ml-1" rounded="circle" width="24" height="24" :src="post.author.logo" alt="头像"></b-img>
-      <span class="small ml-1">{{post.author.nick_name}}</span>
-      <span class="small ml-3">
-        <i class="fa fa-calendar-times-o ml-2 mr-1"></i>
-        {{getPostCreateDate(post)}}
-      </span>
-      <span class="small ml-3"><i class="fa fa-book mr-1"></i>{{post.category}}</span>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="block mb-1 mb-sm-2 p-2 p-lg-3" v-for="post in listData">
+        <h2 class="title mb-4">{{post.title}}</h2>
+        <div class="post-meta mb-4">
+          <b-img class="d-inline-block ml-1" rounded="circle" width="24" height="24" :src="post.author.logo" alt="头像"></b-img>
+          <span class="small ml-1">{{post.author.nick_name}}</span>
+          <span class="small ml-3">
+            <i class="fa fa-calendar-times-o ml-2 mr-1"></i>
+            {{getPostCreateDate(post)}}
+          </span>
+          <span class="small ml-3"><i class="fa fa-book mr-1"></i>{{post.category}}</span>
+        </div>
+        <p class="mb-4"><span v-html="getSummary(post)"></span></p>
+        <div class="post-meta clearfix">
+          <span class="small"><i class="fa fa-eye mr-2 ml-2"></i>{{post.click_nums}}</span>
+          <b-button
+            variant="link"
+            class="float-right mr-5"
+            :to="{name: 'posts', params: {id:post.id}}"
+          >[阅读全文]</b-button>
+        </div>
+      </div>
+      <b-pagination
+        v-if="paginationShow"
+        class="mt-4 mb-4"
+        align="center"
+        size="md"
+        :total-rows="postsNum"
+        v-model="currentPage"
+        :per-page="pageSize"
+        @change="pageChange">
+      </b-pagination>
     </div>
-    <p class="mb-4"><span v-html="getSummary(post)"></span></p>
-    <div class="post-meta clearfix">
-      <span class="small"><i class="fa fa-eye mr-2 ml-2"></i>{{post.click_nums}}</span>
-      <b-button
-        variant="link"
-        class="float-right mr-5"
-        :to="{name: 'posts', params: {id:post.id}}"
-      >[阅读全文]</b-button>
+    <div class="col-lg-4">
+      <category-card v-on:filterByCategory="filterByCategory"/>
     </div>
   </div>
-  <b-pagination
-    v-if="paginationShow"
-    class="mt-4 mb-4"
-    align="center"
-    size="md"
-    :total-rows="postsNum"
-    v-model="currentPage"
-    :per-page="pageSize"
-    @change="pageChange">
-  </b-pagination>
 </div>
 </template>
 
 <script>
+  import CategoryCard from '../components/CategoryCard'
   import { getBlogList, getBlogDetail } from "../api/api";
 
   export default {
     name: 'BlogList',
+    components: {
+      'categoryCard': CategoryCard,
+    },
     data () {
       return {
         pageType: 'list',
@@ -53,7 +64,7 @@
     },
     mounted() {
       console.log('BlogList mounted');
-      this.getAllData();
+      this.getListData();
     },
     computed: {
       paginationShow: function () {
@@ -61,59 +72,49 @@
       }
     },
     methods: {
-      getAllData() {
-        console.log('BlogList getAllData '+this.$route.params.keyword);
-        if(this.$route.params.keyword) {
-          this.pageType = 'search';
-          this.searchWord = this.$route.params.keyword;
-        } else {
-          this.pageType = 'list';
-        }
-        this.getListData();
-      },
       getListData() {
         console.log(this.pageType);
-        if(this.pageType === 'search') {
-          getBlogList({
-            search: this.searchWord,
-            page: this.currentPage,
-          }).then((response) => {
-            this.listData = response.data.results;
-            this.postsNum = response.data.count;
-          }).catch(error => {
-            console.log(error);
-          });
-        } else if (this.pageType === 'category'){
-          getBlogList({
-            category: this.category,
-            page: this.currentPage,
-          }).then((response) => {
-            this.listData = response.data.results;
-            this.postsNum = response.data.count;
-          })
-        } else if (this.pageType === 'post'){
-          getBlogDetail(this.post_id)
-            .then((response) => {
-            console.log(response.data)
-          })
-        } else {
-          // pageType == list
-          getBlogList({
-            page: this.currentPage,
-          }).then((response) => {
-            this.listData = response.data.results;
-            this.postsNum = response.data.count;
-          }).catch(error => {
-            console.log(error);
-          });
+        switch (this.pageType) {
+          case 'search': {
+            getBlogList({
+              search: this.searchWord,
+              page: this.currentPage,
+            }).then((response) => {
+              this.listData = response.data.results;
+              this.postsNum = response.data.count;
+            }).catch(error => {
+              console.log(error);
+            });
+          } break;
+          case 'category': {
+            getBlogList({
+              category: this.category,
+              page: this.currentPage,
+            }).then((response) => {
+              this.listData = response.data.results;
+              this.postsNum = response.data.count;
+            })
+          } break;
+          default: {
+            // pageType == list
+            getBlogList({
+              page: this.currentPage,
+            }).then((response) => {
+              this.listData = response.data.results;
+              this.postsNum = response.data.count;
+            }).catch(error => {
+              console.log(error);
+            });
+          }
         }
       },
       pageChange(currentPage) {
         this.currentPage = currentPage;
         this.getListData();
       },
+      // 生成文章发布日期
       getPostCreateDate(post) {
-        let create_time = new Date(post.create_time)
+        let create_time = new Date(post.create_time);
         let now = new Date().getTime();
         let day = Math.abs(now-create_time.getTime());
         let res = new Date(day).getDate()-1;
@@ -131,6 +132,7 @@
         }
         return res
       },
+      // 自动生成摘要
       getSummary(data) {
         let trimHtml = require('trim-html');
         let trimmed = trimHtml(data.content, {
@@ -140,6 +142,13 @@
         });
         return trimmed.html;
       },
+      // 按文章类别过滤文章
+      filterByCategory(id) {
+        this.$router.push({
+          name: 'category',
+          params: { category: id }
+        })
+      }
     },
     watch: {
       '$route': function(route) {
@@ -147,36 +156,16 @@
         console.log(route);
         console.log(route.params);
         this.currentPage = 1;
-        if(route.name==='search') {
-          this.pageType = 'search';
-          this.searchWord = route.params.keyword;
-          this.getListData();
-        } else if (route.name==='category') {
-          this.pageType = 'category';
-          this.category = route.params.category;
-          this.getListData();
-        } else if(route.name==='posts'){
-          this.pageType = 'post';
-          this.post_id = route.params.id;
-          this.getListData();
-        } else {
-          // main list
-          this.pageType = 'list';
-          this.getListData();
+        switch (route.name) {
+          case 'search': this.searchWord = route.params.keyword; break;
+          case 'category': this.category = route.params.category; break;
+          default:// main list
+                break;
         }
+        this.pageType = route.name
+        this.getListData();
       }
     },
-    // beforeRouteEnter(to, from, next) {
-    //   console.log('beforeRouteEnter')
-    //   console.log(to)
-    //   console.log(from)
-    //   console.log(next)
-    //   next()
-    // },
-    // beforeRouteUpdate(to, from, next) {
-    //   console.log('beforeRouteUpdate')
-    //   next()
-    // }
   }
 </script>
 

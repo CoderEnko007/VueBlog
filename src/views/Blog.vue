@@ -3,17 +3,7 @@
     <blog-header v-on:search="doingSearch"/>
     <div class="main">
       <div class="container">
-        <div class="row">
-          <div v-if="showList" class="col-lg-8">
-            <blog-list/>
-          </div>
-          <div v-else class="col-lg-8">
-            <router-view></router-view>
-          </div>
-          <div class="col-lg-4">
-            <category-card v-on:filterByCategory="filterByCategory"/>
-          </div>
-        </div>
+        <router-view></router-view>
       </div>
     </div>
     <blog-footer/>
@@ -24,7 +14,6 @@
   import Header from '../components/Header'
   import BlogList from '../components/BlogList'
   import Footer from '../components/Footer'
-  import CategoryCard from '../components/CategoryCard'
 
   export default {
     name: 'Blog',
@@ -32,20 +21,11 @@
       'blogHeader': Header,
       'blogList': BlogList,
       'blogFooter': Footer,
-      'categoryCard': CategoryCard,
     },
     data () {
       return {
         searchWord: '',
       }
-    },
-    computed: {
-      showList: function() {
-        return this.$route.name === 'blog';
-      },
-    },
-    mounted() {
-
     },
     methods: {
       doingSearch(word) {
@@ -58,12 +38,6 @@
           });
         }
       },
-      filterByCategory(id) {
-        this.$router.push({
-          name: 'category',
-          params: { category: id }
-        })
-      }
     },
   }
 </script>

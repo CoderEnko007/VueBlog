@@ -25,9 +25,7 @@
     },
     methods: {
       getCategoryList(){
-        getCategory({
-
-        }).then((response) => {
+        getCategory().then((response) => {
           this.categorys = response.data;
           // console.log(this.categorys)
         })
