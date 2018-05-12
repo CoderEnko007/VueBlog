@@ -4,24 +4,14 @@
     <div class="main">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8">
+          <div v-if="showList" class="col-lg-8">
             <blog-list/>
           </div>
+          <div v-else class="col-lg-8">
+            <router-view></router-view>
+          </div>
           <div class="col-lg-4">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                <router-link to="/">Cras justo odio</router-link>
-                <b-badge variant="primary" pill>14</b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                <router-link to="/">Dapibus ac facilisis in</router-link>
-                <b-badge variant="primary" pill>2</b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                <router-link to="/">Morbi leo risus</router-link>
-                <b-badge variant="primary" pill>1</b-badge>
-              </b-list-group-item>
-            </b-list-group>
+            <category-card v-on:filterByCategory="filterByCategory"/>
           </div>
         </div>
       </div>
@@ -34,6 +24,7 @@
   import Header from '../components/Header'
   import BlogList from '../components/BlogList'
   import Footer from '../components/Footer'
+  import CategoryCard from '../components/CategoryCard'
 
   export default {
     name: 'Blog',
@@ -41,11 +32,17 @@
       'blogHeader': Header,
       'blogList': BlogList,
       'blogFooter': Footer,
+      'categoryCard': CategoryCard,
     },
     data () {
       return {
         searchWord: '',
       }
+    },
+    computed: {
+      showList: function() {
+        return this.$route.name === 'blog';
+      },
     },
     mounted() {
 
@@ -60,8 +57,14 @@
             params: { keyword: this.searchWord }
           });
         }
+      },
+      filterByCategory(id) {
+        this.$router.push({
+          name: 'category',
+          params: { category: id }
+        })
       }
-    }
+    },
   }
 </script>
 

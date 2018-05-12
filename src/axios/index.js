@@ -2,8 +2,8 @@ import axios from 'axios';
 
 axios.interceptors.request.use(
   config => {
-    console.log('axios request====================>');
-    console.log(config);
+    // console.log('axios request====================>');
+    // console.log(config);
     return config;
   },
   err => {
@@ -13,8 +13,8 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   response => {
-    console.log('axios response====================>');
-    console.log(response);
+    // console.log('axios response====================>');
+    // console.log(response);
     return response;
   },
   error => {

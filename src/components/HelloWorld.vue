@@ -1,4 +1,5 @@
 <template>
+  <p>{{msg}}</p>
 </template>
 
 <script>

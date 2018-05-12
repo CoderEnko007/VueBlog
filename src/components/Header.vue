@@ -11,22 +11,12 @@
       <b-collapse is-nav id="nav_collapse">
 
         <b-navbar-nav class="ml-auto mr-5">
-          <b-nav-item class="mr-4">
-            <router-link to="/">
-              <a class="nav-item">首&nbsp&nbsp&nbsp&nbsp页</a>
-            </router-link>
+          <b-nav-item class="mr-4" to="/">
+            <a class="nav-item"><i class="fa fa-home mr-2"></i>首&nbsp&nbsp&nbsp&nbsp页</a>
           </b-nav-item>
-          <b-nav-item-dropdown class="mr-4">
-            <template slot="button-content">
-              <a class="nav-item">分&nbsp&nbsp&nbsp&nbsp类</a>
-            </template>
-            <b-dropdown-item href="#" v-for="category in categorys" :key="category.id">{{category.item}}</b-dropdown-item>
-          </b-nav-item-dropdown>
           <b-nav-item href="#" class="mr-4"><a class="nav-item">归&nbsp&nbsp&nbsp&nbsp档</a></b-nav-item>
-          <b-nav-item class="mr-5">
-            <router-link to="/helloworld/">
+          <b-nav-item class="mr-5" to="/helloworld">
               <a class="nav-item">关&nbsp&nbsp&nbsp&nbsp于</a>
-            </router-link>
           </b-nav-item>
           <b-nav-form>
             <b-form-input size="sm" class="mr-sm-2 search-input" type="text" v-model="searchWord" placeholder="Search"/>
@@ -60,7 +50,7 @@
         ]
       },
       search() {
-        console.log('search click');
+
         this.$emit('search', this.searchWord)
       }
     },
@@ -90,7 +80,4 @@ a {
   color: $pink;
 }
 
-.dropdown-item:hover, .dropdown-item:focus {
-  border: none;
-}
 </style>

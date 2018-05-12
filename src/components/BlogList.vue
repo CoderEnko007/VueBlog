@@ -3,19 +3,26 @@
   <div class="block mb-1 mb-sm-2 p-2 p-lg-3" v-for="post in listData">
     <h2 class="title mb-4">{{post.title}}</h2>
     <div class="post-meta mb-4">
-      <b-img rounded="circle" width="24" height="24" :src="post.author.logo" alt="头像"></b-img>
-      <span class="small">{{post.author.nick_name}}</span>
-      <span class="small ml-3"><i class="fa fa-calendar-times-o ml-2 mr-1"></i>{{getPostCreateDate(post)}}</span>
+      <b-img class="d-inline-block ml-1" rounded="circle" width="24" height="24" :src="post.author.logo" alt="头像"></b-img>
+      <span class="small ml-1">{{post.author.nick_name}}</span>
+      <span class="small ml-3">
+        <i class="fa fa-calendar-times-o ml-2 mr-1"></i>
+        {{getPostCreateDate(post)}}
+      </span>
       <span class="small ml-3"><i class="fa fa-book mr-1"></i>{{post.category}}</span>
     </div>
     <p class="mb-4"><span v-html="getSummary(post)"></span></p>
-    <div class="post-meta">
+    <div class="post-meta clearfix">
       <span class="small"><i class="fa fa-eye mr-2 ml-2"></i>{{post.click_nums}}</span>
-      <router-link to="#" class="float-right mr-4">[阅读全文]</router-link>
+      <b-button
+        variant="link"
+        class="float-right mr-5"
+        :to="{name: 'posts', params: {id:post.id}}"
+      >[阅读全文]</b-button>
     </div>
   </div>
   <b-pagination
-    v-if="postsNum/pageSize"
+    v-if="paginationShow"
     class="mt-4 mb-4"
     align="center"
     size="md"
@@ -28,7 +35,7 @@
 </template>
 
 <script>
-  import { getBlogList } from "../api/api";
+  import { getBlogList, getBlogDetail } from "../api/api";
 
   export default {
     name: 'BlogList',
@@ -40,15 +47,22 @@
         listData: [],
         postsNum: 0,
         pageSize: 5,
+        category: 1,
+        post_id: 1,
       }
     },
     mounted() {
       console.log('BlogList mounted');
       this.getAllData();
     },
+    computed: {
+      paginationShow: function () {
+        return this.postsNum / this.pageSize > 1;
+      }
+    },
     methods: {
       getAllData() {
-        console.log(this.$route.params.keyword);
+        console.log('BlogList getAllData '+this.$route.params.keyword);
         if(this.$route.params.keyword) {
           this.pageType = 'search';
           this.searchWord = this.$route.params.keyword;
@@ -59,27 +73,37 @@
       },
       getListData() {
         console.log(this.pageType);
-        if(this.pageType === 'list'){
-          getBlogList({
-            page: this.currentPage,
-          }).then((response) => {
-            this.listData = response.data.results;
-            this.postsNum = response.data.count;
-            console.log('list:'+this.postsNum, this.listData);
-          }).catch(error => {
-            console.log('BlogList getListData 1');
-            console.log(error);
-          });
-        } else {
+        if(this.pageType === 'search') {
           getBlogList({
             search: this.searchWord,
             page: this.currentPage,
           }).then((response) => {
             this.listData = response.data.results;
             this.postsNum = response.data.count;
-            console.log('search:'+this.postsNum, this.listData);
           }).catch(error => {
-            console.log('BlogList getListData 2');
+            console.log(error);
+          });
+        } else if (this.pageType === 'category'){
+          getBlogList({
+            category: this.category,
+            page: this.currentPage,
+          }).then((response) => {
+            this.listData = response.data.results;
+            this.postsNum = response.data.count;
+          })
+        } else if (this.pageType === 'post'){
+          getBlogDetail(this.post_id)
+            .then((response) => {
+            console.log(response.data)
+          })
+        } else {
+          // pageType == list
+          getBlogList({
+            page: this.currentPage,
+          }).then((response) => {
+            this.listData = response.data.results;
+            this.postsNum = response.data.count;
+          }).catch(error => {
             console.log(error);
           });
         }
@@ -95,12 +119,12 @@
         let res = new Date(day).getDate()-1;
 
         switch (res) {
-          case 0: res = '今天'; break;
-          case 1: res = '昨天'; break;
-          case 2: res = '前天'; break;
+          case 0: res = '今天发布'; break;
+          case 1: res = '昨天发布'; break;
+          case 2: res = '前天发布'; break;
           default:
             if(res <= 7) {
-              res = res + '天前'
+              res = res + '天前发布'
             } else {
               res = post.create_time;
             }
@@ -115,25 +139,44 @@
           suffix: ' […]'
         });
         return trimmed.html;
-      }
-
+      },
     },
     watch: {
       '$route': function(route) {
+        console.log("BlogList watch route");
         console.log(route);
-        console.log(route.params.keyword)
-        if(route.params.keyword) {
+        console.log(route.params);
+        this.currentPage = 1;
+        if(route.name==='search') {
           this.pageType = 'search';
-          this.currentPage = 1;
           this.searchWord = route.params.keyword;
           this.getListData();
-        } else if (route.path==='/'){
+        } else if (route.name==='category') {
+          this.pageType = 'category';
+          this.category = route.params.category;
+          this.getListData();
+        } else if(route.name==='posts'){
+          this.pageType = 'post';
+          this.post_id = route.params.id;
+          this.getListData();
+        } else {
+          // main list
           this.pageType = 'list';
-          this.currentPage = 1;
           this.getListData();
         }
       }
-    }
+    },
+    // beforeRouteEnter(to, from, next) {
+    //   console.log('beforeRouteEnter')
+    //   console.log(to)
+    //   console.log(from)
+    //   console.log(next)
+    //   next()
+    // },
+    // beforeRouteUpdate(to, from, next) {
+    //   console.log('beforeRouteUpdate')
+    //   next()
+    // }
   }
 </script>
 
@@ -156,9 +199,6 @@
 .block>p {
   color: $meta-word;
   font: 300 15px/1.5em "Helvetica Neue", Helvetica, sans-serif;
-}
-.post-meta>img {
-  display: inline-block;
 }
 
 </style>
