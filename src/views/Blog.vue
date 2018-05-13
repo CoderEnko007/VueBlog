@@ -44,7 +44,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '../assets/css/pink-style';
+@import '../assets/css/custom';
 .main {
   margin-top: 40px;
 }

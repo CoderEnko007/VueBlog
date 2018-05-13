@@ -1,0 +1,17 @@
+$bgcolor:#f8f9fa;
+$pink:#f25d8e;
+$pink-shadow:rgba(242, 93, 142, 0.25);
+$meta-word:#3E3E3E;
+
+.block {
+  background-color: #fff;
+}
+.block:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.275);
+}
+.small {
+  color: $meta-word;
+}
+.title {
+  color: $meta-word;
+}

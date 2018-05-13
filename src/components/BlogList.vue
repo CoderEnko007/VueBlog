@@ -43,7 +43,7 @@
 
 <script>
   import CategoryCard from '../components/CategoryCard'
-  import { getBlogList, getBlogDetail } from "../api/api";
+  import { getBlogList } from "../api/api";
 
   export default {
     name: 'BlogList',
@@ -64,6 +64,9 @@
     },
     mounted() {
       console.log('BlogList mounted');
+      if (this.$route.params.showCategory) {
+        this.pageType = 'category';
+      }
       this.getListData();
     },
     computed: {
@@ -73,7 +76,9 @@
     },
     methods: {
       getListData() {
+        console.log('getListData');
         console.log(this.pageType);
+        console.log(this.$route.params.showCategory);
         switch (this.pageType) {
           case 'search': {
             getBlogList({
@@ -150,6 +155,9 @@
         })
       }
     },
+    created() {
+      console.log('created');
+    },
     watch: {
       '$route': function(route) {
         console.log("BlogList watch route");
@@ -162,7 +170,7 @@
           default:// main list
                 break;
         }
-        this.pageType = route.name
+        this.pageType = route.name;
         this.getListData();
       }
     },
@@ -171,20 +179,8 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '../assets/css/pink-style.scss';
+@import '../assets/css/custom';
 
-.block {
-  background-color: #fff;
-}
-.block:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.275);
-}
-.small {
-  color: $meta-word;
-}
-.title {
-  color: $meta-word;
-}
 .block>p {
   color: $meta-word;
   font: 300 15px/1.5em "Helvetica Neue", Helvetica, sans-serif;

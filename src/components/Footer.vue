@@ -18,7 +18,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-@import '../assets/css/pink-style.scss';
+@import '../assets/css/custom.scss';
 
 .card {
   color: #f4f4f4;

@@ -62,7 +62,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '../assets/css/pink-style.scss';
+@import '../assets/css/custom';
 a {
   color: inherit;
   text-decoration: none;
