@@ -23,6 +23,15 @@
             <b-button variant="outline-primary" size="sm"
                       class="my-2 my-sm-0" type="submit"
                       @click="search" >搜 索</b-button>
+            <div>
+              <i class="editEntry fa fa-sign-in ml-3" @click="modalShow = !modalShow"></i>
+              <b-modal ref="modal" v-model="modalShow" title="请登录" @ok="login">
+                <form class="mt-3 mb-3" @submit.stop.prevent="handleSubmit">
+                    <b-form-input class="form-input" v-model="username" placeholder="用户名"></b-form-input>
+                    <b-form-input type="password" class="form-input" v-model="password" placeholder="密码"></b-form-input>
+                </form>
+              </b-modal>
+            </div>
           </b-nav-form>
         </b-navbar-nav>
 
@@ -37,26 +46,36 @@
     data () {
       return {
         title: "袁方的博客",
-        categorys:[],
         searchWord:'',
+        modalShow: false,
+        username: '',
+        password: '',
       }
     },
     methods: {
-      getCategorys() {
-        this.categorys = [
-          {id: 0, item: 'Python 基础', nums:0},
-          {id: 1, item: 'Django 学习', nums:0},
-          {id: 2, item: 'Opencv 学习', nums:0},
-        ]
+      search(evt) {
+        evt.preventDefault();
+        if(this.searchWord !== '') {
+          this.$emit('search', this.searchWord)
+        }
       },
-      search() {
-
-        this.$emit('search', this.searchWord)
+      login(evt) {
+        // evt.preventDefault();
+        if(!this.username || !this.password) {
+          alert("请输入用户名密码！")
+        } else {
+          this.handleSubmit();
+        }
+      },
+      handleSubmit () {
+        console.log("handleSubmit");
+        console.log(this.username, this.password);
+        this.$refs.modal.hide();
+        this.$router.push({
+          name: 'admin'
+        })
       }
     },
-    mounted() {
-      this.getCategorys()
-    }
   }
 </script>
 
@@ -78,6 +97,17 @@ a {
 }
 .nav-link>a:hover {
   color: $pink;
+}
+.editEntry {
+  cursor: pointer;
+}
+.editEntry:hover {
+  color: $pink;
+}
+.form-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
 }
 
 </style>

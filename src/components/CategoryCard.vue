@@ -27,7 +27,7 @@
       getCategoryList(){
         getCategory().then((response) => {
           this.categorys = response.data;
-          // console.log(this.categorys)
+          console.log(this.categorys)
         })
       },
       filterPost(id) {

@@ -3,11 +3,16 @@ import Router from 'vue-router'
 import Blog from '../views/Blog'
 import BlogList from '../components/BlogList'
 import Article from '../components/Article'
+import Admin from '../admin/Admin'
+import EditPage from '../admin/EditPage'
+import ListPage from '../admin/ListPage'
+import SearchPage from '../admin/SearchPage'
 import HelloWorld from '../components/HelloWorld'
 
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -54,9 +59,23 @@ export default new Router({
       ]
     },
     {
+      path: '/admin',
+      name: 'admin',
+      component: Admin,
+      children: [
+        {path: '/admin/editPage', component: EditPage, name: 'editPage'},
+        {path: '/admin/listPage', component: ListPage, name: 'listPage'},
+        {path: '/admin/searchPage', component: SearchPage, name: 'searchPage'},
+      ],
+      meta: {
+        title: '博客后台',
+        need_log: true
+      }
+    },
+    {
       path: '/helloworld',
       name: 'HelloWorld',
       component: HelloWorld
-    }
+    },
   ]
 })

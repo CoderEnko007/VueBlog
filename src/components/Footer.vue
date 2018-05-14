@@ -17,8 +17,8 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-@import '../assets/css/custom.scss';
+<style lang="scss" scoped>
+@import '../../scss/custom';
 
 .card {
   color: #f4f4f4;

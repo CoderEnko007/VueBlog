@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div v-show="show" class="row">
-      <div class="col-9">
+      <div class="col-lg-9">
         <b-breadcrumb class="bg-white mb-2" :items="items"/>
         <div class="bg-white mb-1 mb-sm-2 p-2 p-lg-3">
           <h2 class="title mb-3 text-primary">{{title}}</h2>
@@ -12,7 +12,7 @@
           <span v-html="content"></span>
         </div>
       </div>
-      <div class="col-3">
+      <div class="col-lg-3">
           {{msg}}
       </div>
     </div>
@@ -97,7 +97,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '../assets/css/custom.scss';
+@import '../../scss/custom';
 hr {
   height: 1px;
   border: none;

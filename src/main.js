@@ -4,16 +4,18 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
+import mavonEditor from 'mavon-editor'
 
 import './axios'
-
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'font-awesome/css/font-awesome.css'
+import 'mavon-editor/dist/css/index.css'
 
 Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
+Vue.use(mavonEditor);
 
 /* eslint-disable no-new */
 new Vue({
@@ -21,4 +23,4 @@ new Vue({
   router,
   components: { App },
   template: '<App/>'
-})
+});

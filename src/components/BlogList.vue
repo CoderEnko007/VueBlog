@@ -66,6 +66,7 @@
       console.log('BlogList mounted');
       if (this.$route.params.showCategory) {
         this.pageType = 'category';
+        this.category = this.$route.params.category;
       }
       this.getListData();
     },
@@ -78,7 +79,6 @@
       getListData() {
         console.log('getListData');
         console.log(this.pageType);
-        console.log(this.$route.params.showCategory);
         switch (this.pageType) {
           case 'search': {
             getBlogList({
@@ -96,6 +96,7 @@
               category: this.category,
               page: this.currentPage,
             }).then((response) => {
+              console.log(response.data)
               this.listData = response.data.results;
               this.postsNum = response.data.count;
             })
