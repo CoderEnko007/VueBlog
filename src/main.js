@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import mavonEditor from 'mavon-editor'
+import store from './store/store'
 
 import './axios'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -21,6 +22,7 @@ Vue.use(mavonEditor);
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 });

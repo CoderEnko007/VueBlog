@@ -41,42 +41,61 @@
 </template>
 
 <script>
-  export default {
-    name: 'Header',
-    data () {
-      return {
-        title: "袁方的博客",
-        searchWord:'',
-        modalShow: false,
-        username: '',
-        password: '',
+import {login, getUserDetail} from "../api/api";
+import cookie from '../assets/js/cookie'
+
+export default {
+  name: 'Header',
+  data () {
+    return {
+      title: "袁方的博客",
+      searchWord:'',
+      modalShow: false,
+      username: '',
+      password: '',
+      userInfo: ''
+    }
+  },
+  methods: {
+    search(evt) {
+      evt.preventDefault();
+      if(this.searchWord !== '') {
+        this.$emit('search', this.searchWord)
       }
     },
-    methods: {
-      search(evt) {
-        evt.preventDefault();
-        if(this.searchWord !== '') {
-          this.$emit('search', this.searchWord)
-        }
-      },
-      login(evt) {
-        // evt.preventDefault();
-        if(!this.username || !this.password) {
-          alert("请输入用户名密码！")
-        } else {
-          this.handleSubmit();
-        }
-      },
-      handleSubmit () {
-        console.log("handleSubmit");
-        console.log(this.username, this.password);
-        this.$refs.modal.hide();
+    login() {
+      if(!this.username || !this.password) {
+        alert("请输入用户名密码！")
+      } else {
+        this.handleSubmit();
+      }
+    },
+    handleSubmit () {
+      console.log("handleSubmit");
+      console.log(this.username, this.password);
+      login({
+        username: this.username,
+        password: this.password
+      }).then((response) => {
+        cookie.setCookie('token',response.data.token,7);
+        console.log(response.data.token);
+        this.getUserInfo();
+      });
+    },
+    getUserInfo() {
+      let that = this;
+      getUserDetail().then((response) => {
+        console.log(response)
+        this.userInfo = response.data;
+        cookie.setCookie('name', this.userInfo.name);
+        that.$store.dispatch('setInfo');
         this.$router.push({
           name: 'admin'
         })
-      }
-    },
-  }
+      })
+    }
+  },
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

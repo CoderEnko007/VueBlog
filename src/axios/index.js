@@ -1,9 +1,13 @@
 import axios from 'axios';
+import store from '../store/store';
 
 axios.interceptors.request.use(
   config => {
     // console.log('axios request====================>');
     // console.log(config);
+    if (store.state.userInfo.token) {
+      config.headers.Authorization = `JWT ${store.state.userInfo.token}`;
+    }
     return config;
   },
   err => {
