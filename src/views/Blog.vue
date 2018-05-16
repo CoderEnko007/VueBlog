@@ -1,7 +1,7 @@
 <template>
   <div class="blog">
     <blog-header v-on:search="doingSearch"/>
-    <div class="main">
+    <div id="main" class="mt-4">
       <div class="container">
         <router-view></router-view>
       </div>
@@ -45,9 +45,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import '../../scss/custom';
-.main {
-  margin-top: 40px;
-}
+
 .list-group-item>a {
   color: $meta-word;
   text-decoration: none;

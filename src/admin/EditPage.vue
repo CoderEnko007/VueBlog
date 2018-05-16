@@ -25,14 +25,20 @@
         </div>
       </form>
     </b-modal>
+    <b-modal ref="loadingModal" hide-footer title="Loading...">
+      <vue-loading v-if="submitting" type="bars" color="#d9544e" :size="{ width: '50px', height: '50px' }"></vue-loading>
+      <p v-else="!submitting">{{getResultInfo}}</p>
+      <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">关 闭</b-btn>
+    </b-modal>
     <mavon-editor ref="editor" v-model="value"/>
-    <vue-markdown :source="getSourceData" :toc=true :html=false @rendered="handleData"></vue-markdown>
+    <!--<vue-markdown :show=false :source="getSourceData" :toc=true :html=false @toc-rendered="handleData"></vue-markdown>-->
   </div>
 </template>
 
 <script>
 import InputTag from 'vue-input-tag'
 import VueMarkdown from 'vue-markdown'
+import vueLoading from 'vue-loading-template'
 import {getCategory, postBlogList} from "../api/api";
 
 export default {
@@ -40,27 +46,34 @@ export default {
   components: {
     'input-tag': InputTag,
     VueMarkdown,
+    vueLoading,
   },
   data () {
     return {
       article:{
         title: '',
         category: '',
-        tags: '',
+        tags: [1,2],
         md_content: '',
-        md_TOC: '',
+        md_TOC: ''
       },
       modalShow: false,
       categoryArray: [],
       categoryNameArray: [],
       tagsArray: ['hello', 'world'],
       value: '',
-      md_TOC: ''
+      md_TOC: '',
+      submitting: true,
+      resultInfo: '',
     }
   },
   computed: {
     getSourceData: function() {
       return this.value;
+    },
+    getResultInfo: function() {
+      console.log(this.resultInfo);
+      return this.resultInfo;
     }
   },
   methods: {
@@ -68,18 +81,31 @@ export default {
       this.handleSubmit();
     },
     handleSubmit() {
-      console.log(this.article.title)
-      console.log(this.tagsArray)
       console.log(this.article.category)
+      console.log(this.categoryArray)
+      for (let index in this.categoryArray) {
+        if (this.article.category === this.categoryArray[index].name) {
+          this.article.category = this.categoryArray[index].id;
+        }
+      }
+    },
+    handleData(data) {
+      this.md_TOC = data;
+      console.log(data)
     },
     submitBlog() {
       let MarkdownIt = require('markdown-it');
       let md = new MarkdownIt();
       this.article.md_content = md.render(this.value);
       this.article.md_TOC = this.md_TOC;
+
+      this.submitting = true;
+      this.$refs.loadingModal.show();
+      console.log(this.article);
+      this.postArticle();
     },
-    handleData(data) {
-      this.md_TOC = data;
+    hideModal() {
+      this.$refs.loadingModal.hide();
     },
 
     getCategoryList(){
@@ -90,6 +116,26 @@ export default {
         });
         console.log(this.categoryNameArray)
       })
+    },
+    postArticle() {
+      postBlogList({
+        title: this.article.title,
+        tags: this.article.tags,
+        category: this.article.category,
+        content: this.article.md_content,
+      }).then((response) => {
+        this.submitting = false;
+        this.resultInfo = '上传成功！';
+        console.log(response)
+      }).catch(error => {
+        this.submitting = false;
+        for (let item in error) {
+          if (error.hasOwnProperty(item)) {
+            this.resultInfo += error[item][0];
+            this.resultInfo += ', ';
+          }
+        }
+      });
     }
   },
   mounted() {

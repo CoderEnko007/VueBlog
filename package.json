@@ -19,6 +19,7 @@
     "vue-axios": "^2.1.1",
     "vue-input-tag": "^1.0.3",
     "vue-loader": "^13.7.1",
+    "vue-loading-template": "^0.1.7",
     "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1",
     "vue-tagsinput": "^2.0.1",

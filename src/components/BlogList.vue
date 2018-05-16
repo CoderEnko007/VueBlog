@@ -103,6 +103,7 @@
           } break;
           default: {
             // pageType == list
+            console.log('getListData default currentPage='+this.currentPage);
             getBlogList({
               page: this.currentPage,
             }).then((response) => {
@@ -111,10 +112,12 @@
             }).catch(error => {
               console.log(error);
             });
+            break;
           }
         }
       },
       pageChange(currentPage) {
+        console.log('pageChange '+ currentPage)
         this.currentPage = currentPage;
         this.getListData();
       },

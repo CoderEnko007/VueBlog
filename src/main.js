@@ -3,9 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store/store'
 import BootstrapVue from 'bootstrap-vue'
 import mavonEditor from 'mavon-editor'
-import store from './store/store'
 
 import './axios'
 import 'bootstrap/dist/css/bootstrap.css'

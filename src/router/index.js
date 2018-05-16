@@ -62,6 +62,7 @@ export default new Router({
       path: '/admin',
       name: 'admin',
       component: Admin,
+      redirect: { name: 'editPage'},
       children: [
         {path: '/admin/editPage', component: EditPage, name: 'editPage'},
         {path: '/admin/listPage', component: ListPage, name: 'listPage'},

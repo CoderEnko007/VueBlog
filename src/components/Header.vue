@@ -24,17 +24,20 @@
                       class="my-2 my-sm-0" type="submit"
                       @click="search" >搜 索</b-button>
             <div>
-              <i class="editEntry fa fa-sign-in ml-3" @click="modalShow = !modalShow"></i>
+              <i class="editEntry fa fa-sign-in ml-3" @click="showModal"></i>
               <b-modal ref="modal" v-model="modalShow" title="请登录" @ok="login">
                 <form class="mt-3 mb-3" @submit.stop.prevent="handleSubmit">
-                    <b-form-input class="form-input" v-model="username" placeholder="用户名"></b-form-input>
-                    <b-form-input type="password" class="form-input" v-model="password" placeholder="密码"></b-form-input>
+                  <b-form-input class="form-input" v-model="username" placeholder="用户名"></b-form-input>
+                  <b-form-input type="password" class="form-input" v-model="password" placeholder="密码"></b-form-input>
+                  <div v-show="loading">
+                    <vue-loading v-if="!loginFailedFlag" type="bars" color="#d9544e" :size="{ width: '50px', height: '50px' }"></vue-loading>
+                    <p v-else="loginFailedFlag">{{getFailedInfo}}</p>
+                  </div>
                 </form>
               </b-modal>
             </div>
           </b-nav-form>
         </b-navbar-nav>
-
       </b-collapse>
     </b-navbar>
   </div>
@@ -43,9 +46,19 @@
 <script>
 import {login, getUserDetail} from "../api/api";
 import cookie from '../assets/js/cookie'
+import vueLoading from 'vue-loading-template'
 
 export default {
   name: 'Header',
+  components: {
+    vueLoading
+  },
+  computed: {
+    getFailedInfo: function() {
+      console.log(this.failedInfo)
+      return this.failedInfo;
+    }
+  },
   data () {
     return {
       title: "袁方的博客",
@@ -53,7 +66,10 @@ export default {
       modalShow: false,
       username: '',
       password: '',
-      userInfo: ''
+      userInfo: '',
+      loading: false,
+      loginFailedFlag: false,
+      failedInfo: 'aaa',
     }
   },
   methods: {
@@ -63,7 +79,12 @@ export default {
         this.$emit('search', this.searchWord)
       }
     },
-    login() {
+    login(evt) {
+      this.loading=false;
+      this.failedInfo = '';
+      this.loginFailedFlag = false;
+      console.log(this.loginFailedFlag);
+      evt.preventDefault();
       if(!this.username || !this.password) {
         alert("请输入用户名密码！")
       } else {
@@ -73,6 +94,7 @@ export default {
     handleSubmit () {
       console.log("handleSubmit");
       console.log(this.username, this.password);
+      this.loading = true;
       login({
         username: this.username,
         password: this.password
@@ -80,19 +102,33 @@ export default {
         cookie.setCookie('token',response.data.token,7);
         console.log(response.data.token);
         this.getUserInfo();
+      }).catch(error => {
+        console.log(error);
+        this.failedInfo = '用户认证失败！';
+        this.loginFailedFlag = true;
       });
     },
     getUserInfo() {
-      let that = this;
       getUserDetail().then((response) => {
-        console.log(response)
+        console.log(response);
         this.userInfo = response.data;
         cookie.setCookie('name', this.userInfo.name);
-        that.$store.dispatch('setInfo');
+        this.$store.dispatch('setInfo');
+        console.log('getUserInfo router to admin');
         this.$router.push({
           name: 'admin'
         })
-      })
+      }).catch(error => {
+        this.failedInfo = '用户数据获取失败！';
+        this.loginFailedFlag = true;
+        console.log(error);
+      });
+    },
+    showModal() {
+      this.loading=false;
+      this.failedInfo = '';
+      this.loginFailedFlag = false;
+      this.$refs.modal.show();
     }
   },
 }

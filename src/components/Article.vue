@@ -12,9 +12,9 @@
           <span v-html="content"></span>
         </div>
       </div>
-      <div class="col-lg-3">
-          {{msg}}
-      </div>
+      <!--<div class="col-lg-3">-->
+          <!--{{msg}}-->
+      <!--</div>-->
     </div>
   </div>
 </template>

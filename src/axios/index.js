@@ -18,11 +18,12 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   response => {
     // console.log('axios response====================>');
-    // console.log(response);
+    console.log(response);
     return response;
   },
   error => {
     let res = error.response;
     console.log(res.status);
+    return Promise.reject(error.response.data)
   }
 );
