@@ -4,13 +4,13 @@
       <h2><router-link to="/" class="title ml-5"><i class="fa fa-home mr-2">&nbsp</i>博客后台</router-link></h2>
     </div>
     <div class="row view-body">
-      <b-nav vertical class="pl-3 bg-dark">
+      <b-nav vertical class="pl-3 bg-dark w-15">
         <b-nav-item v-for="item in items" :key="item.key" @click="test(item)" :to="item.to">
           <i :class="item.class"></i>
           {{item.name}}
         </b-nav-item>
       </b-nav>
-      <div class="col">
+      <div class="col w-75">
         <router-view></router-view>
       </div>
     </div>

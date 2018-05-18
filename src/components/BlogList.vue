@@ -1,5 +1,5 @@
 <template>
-<div class="blog-list">
+<div class="blog-list" v-if="show">
   <div class="row">
     <div class="col-lg-8">
       <div class="block mb-1 mb-sm-2 p-2 p-lg-3" v-for="post in listData">
@@ -60,6 +60,7 @@
         pageSize: 5,
         category: 1,
         post_id: 1,
+        show: false,
       }
     },
     mounted() {
@@ -109,6 +110,7 @@
             }).then((response) => {
               this.listData = response.data.results;
               this.postsNum = response.data.count;
+              this.show = true;
             }).catch(error => {
               console.log(error);
             });

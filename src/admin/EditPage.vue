@@ -39,7 +39,7 @@
 import InputTag from 'vue-input-tag'
 import VueMarkdown from 'vue-markdown'
 import vueLoading from 'vue-loading-template'
-import {getCategory, postBlogList} from "../api/api";
+import {getCategory, postBlogList, getBlogDetail} from "../api/api";
 
 export default {
   name: 'EditPage',
@@ -65,12 +65,17 @@ export default {
       md_TOC: '',
       submitting: true,
       resultInfo: '',
+      mode: {
+        "newBlog": 0,
+        "editBlog": 1,
+      },
+      currentMode: 0,
     }
   },
   computed: {
-    getSourceData: function() {
-      return this.value;
-    },
+    // getSourceData: function() {
+    //   return this.value;
+    // },
     getResultInfo: function() {
       console.log(this.resultInfo);
       return this.resultInfo;
@@ -136,10 +141,24 @@ export default {
           }
         }
       });
-    }
+    },
+    getBlogContent(id) {
+      getBlogDetail(id).then((response) => {
+        let data = response.data;
+        this.value = data.content;
+        this.article.title = data.title;
+        this.article.category = data.category;
+        this.article.tags = data.tags;
+      })
+    },
+
   },
   mounted() {
     this.getCategoryList();
+    if (this.$route.query.id) {
+      this.currentMode = this.mode.editBlog;
+      this.getBlogContent(this.$route.query.id);
+    }
   }
 }
 </script>

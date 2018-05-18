@@ -28,4 +28,7 @@ select:focus, select:active:focus {
   outline: none;
   box-shadow: none;
 }
+* {
+  box-sizing: border-box;
+}
 </style>

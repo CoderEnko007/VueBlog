@@ -9,3 +9,5 @@ export const getCategory = params => { return axios.get(`${host}/categorys`, {pa
 export const postBlogList = params => { return axios.post(`${host}/posts/`, params) };
 export const login = params => { return axios.post(`${host}/login/`, params)};
 export const getUserDetail = () => { return axios.get(`${host}/users/1/`) };
+
+export const getAdminList = () => { return axios.get(`${host}/adminList`)};
