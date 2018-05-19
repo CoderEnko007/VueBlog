@@ -1,5 +1,5 @@
 <template>
-<div class="blog-list" v-if="show">
+<div id="blog-list" v-if="show">
   <div class="row">
     <div class="col-lg-8">
       <div class="block mb-1 mb-sm-2 p-2 p-lg-3" v-for="post in listData">
@@ -44,6 +44,7 @@
 <script>
   import CategoryCard from '../components/CategoryCard'
   import { getBlogList } from "../api/api";
+  import { Loading } from 'element-ui';
 
   export default {
     name: 'BlogList',
@@ -61,6 +62,7 @@
         category: 1,
         post_id: 1,
         show: false,
+        loadingInstance: {},
       }
     },
     mounted() {
@@ -78,18 +80,17 @@
     },
     methods: {
       getListData() {
+        this.loadingInstance = Loading.service({ target:"#blog-list" });
         console.log('getListData');
-        console.log(this.pageType);
         switch (this.pageType) {
           case 'search': {
             getBlogList({
               search: this.searchWord,
               page: this.currentPage,
             }).then((response) => {
-              this.listData = response.data.results;
-              this.postsNum = response.data.count;
+              this.handleResponse(response);
             }).catch(error => {
-              console.log(error);
+              this.handleError(error);
             });
           } break;
           case 'category': {
@@ -97,10 +98,10 @@
               category: this.category,
               page: this.currentPage,
             }).then((response) => {
-              console.log(response.data)
-              this.listData = response.data.results;
-              this.postsNum = response.data.count;
-            })
+              this.handleResponse(response);
+            }).catch(error => {
+              this.handleError(error);
+            });
           } break;
           default: {
             // pageType == list
@@ -108,15 +109,23 @@
             getBlogList({
               page: this.currentPage,
             }).then((response) => {
-              this.listData = response.data.results;
-              this.postsNum = response.data.count;
-              this.show = true;
+              this.handleResponse(response);
             }).catch(error => {
-              console.log(error);
+              this.handleError(error);
             });
             break;
           }
         }
+      },
+      handleResponse(response) {
+        this.listData = response.data.results;
+        this.postsNum = response.data.count;
+        this.show = true;
+        this.loadingInstance.close();
+      },
+      handleError(error) {
+        console.log(error);
+        this.loadingInstance.close();
       },
       pageChange(currentPage) {
         console.log('pageChange '+ currentPage)
@@ -167,8 +176,6 @@
     watch: {
       '$route': function(route) {
         console.log("BlogList watch route");
-        console.log(route);
-        console.log(route.params);
         this.currentPage = 1;
         switch (route.name) {
           case 'search': this.searchWord = route.params.keyword; break;
@@ -191,5 +198,4 @@
   color: $meta-word;
   font: 300 15px/1.5em "Helvetica Neue", Helvetica, sans-serif;
 }
-
 </style>

@@ -1,38 +1,12 @@
 <template>
   <div id="blog-list" class="pt-3">
-    <!--<el-table :data="listData" border>-->
-      <!--<el-table-column  label="标题" width="180" show-overflow-tooltip>-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.title }}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-      <!--<el-table-column  label="标签" width="180" show-overflow-tooltip>-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.tag}}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-      <!--<el-table-column  label="日期" width="150">-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.date}}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-      <!--<el-table-column  label="描述" min-width="320" show-overflow-tooltip>-->
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.description}}</span>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-      <!--<el-table-column  label="操作"  width="160">-->
-        <!--<template slot-scope="scope">-->
-          <!--<el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
-          <!--<el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)" >删除</el-button>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
-    <!--</el-table>-->
     <b-table hover fixed :items="listData" :fields="fields" outlined
              :current-page="currentPage" :per-page="pageSize">
       <template slot="title" slot-scope="data">
-        <!--<router-link :to="{name: 'editPage', query: {id:getPostId}}" @click="handRowClicked">{{data.value}}</router-link>-->
-        <b-button size="sm" variant="link" @click="handleEditPost(data)">{{data.value}}</b-button>
+        <b-button size="sm" variant="link" @click="handleEdit(data)">{{data.value}}</b-button>
+      </template>
+      <template slot="operate" slot-scope="data">
+        <b-button size="sm" variant="danger" @click="handleDelete(data)">删 除</b-button>
       </template>
     </b-table>
     <b-pagination
@@ -49,11 +23,8 @@
 
 <script>
   import vueLoading from 'vue-loading-template'
-  import {getAdminList} from "../api/api";
-
-  // import Vue from 'vue'
-  // import {Table, TableColumn, Button, MessageBox} from 'element-ui'
-  // Vue.prototype.$confirm = MessageBox.confirm;
+  import { Loading } from 'element-ui';
+  import {getAdminList, deleteArticle} from "../api/api";
 
   export default {
     name: 'ListPage',
@@ -70,6 +41,9 @@
             label: '文章标题',
             tdClass: 'table-td'
           },
+          'author.username': {
+            label: '文章作者',
+          },
           category: {
             label: '文章分类',
           },
@@ -83,54 +57,61 @@
           create_time: {
             label: '创建时间',
             sortable: true
-          }
+          },
+          operate: {
+            label: '操作',
+          },
         },
         listData: [],
         currentPage: 1,
         postsNum: 0,
         pageSize: 7,
         post_id: 0,
+        loadingInstance: {},
       }
     },
     methods: {
-      // handleEdit(index, row) {
-      //   console.log(index, row)
-      // },
-      // handleDelete(index, row) {
-      //   this.$confirm('删除该文章，是否继续？', '提示', {
-      //     confirmButtonText: '确定',
-      //     cancelButtonText: '取消',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     console.log(this.listData.length)
-      //     this.listData.splice(index, 1);
-      //     console.log(this.listData.length)
-      //   })
-      // },
       getListData() {
+        this.loadingInstance = Loading.service({ target: '#blog-list' });
         getAdminList().then((response) => {
-          console.log(response)
           this.listData = response.data;
           this.postsNum = this.listData.length;
+          this.loadingInstance.close();
         }).catch(error => {
           console.log(error);
+          this.loadingInstance.close();
         });
       },
+      operateDeleteArticle(id) {
+        this.loadingInstance = Loading.service({ target: '#blog-list' });
+        deleteArticle(id).then(() => {
+          this.getListData();
+        })
+      },
       pageChange(currentPage) {
-        console.log('pageChange '+ currentPage)
+        console.log('pageChange '+ currentPage);
         this.currentPage = currentPage;
         this.getListData();
       },
-      handleEditPost(data) {
+      handleEdit(data) {
         this.post_id = data.item.id;
         this.$router.push({
           name: 'editPage',
           query: {id: this.post_id}
         })
+      },
+      handleDelete(data) {
+        this.$confirm('删除该文章，是否继续？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.operateDeleteArticle(data.item.id)
+        })
       }
     },
     mounted() {
-      this.getListData()
+      this.getListData();
     }
   }
 </script>

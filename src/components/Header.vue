@@ -24,15 +24,12 @@
                       class="my-2 my-sm-0" type="submit"
                       @click="search" >搜 索</b-button>
             <div>
-              <i class="editEntry fa fa-sign-in ml-3" @click="showModal"></i>
-              <b-modal ref="modal" v-model="modalShow" title="请登录" @ok="login">
+              <i class="adminEntry fas fa-sign-in-alt ml-3" @click="showModal"></i>
+              <b-modal ref="modal" id="loginDialog" v-model="modalShow" title="请登录" @ok="login">
                 <form class="mt-3 mb-3" @submit.stop.prevent="handleSubmit">
                   <b-form-input class="form-input" v-model="username" placeholder="用户名"></b-form-input>
                   <b-form-input type="password" class="form-input" v-model="password" placeholder="密码"></b-form-input>
-                  <div v-show="loading">
-                    <vue-loading v-if="!loginFailedFlag" type="bars" color="#d9544e" :size="{ width: '50px', height: '50px' }"></vue-loading>
-                    <p v-else="loginFailedFlag">{{getFailedInfo}}</p>
-                  </div>
+                  <p v-if="loginFailedFlag">{{getFailedInfo}}</p>
                 </form>
               </b-modal>
             </div>
@@ -46,13 +43,10 @@
 <script>
 import {login, getUserDetail} from "../api/api";
 import cookie from '../assets/js/cookie'
-import vueLoading from 'vue-loading-template'
+import { Loading } from 'element-ui'
 
 export default {
   name: 'Header',
-  components: {
-    vueLoading
-  },
   computed: {
     getFailedInfo: function() {
       console.log(this.failedInfo)
@@ -67,9 +61,9 @@ export default {
       username: '',
       password: '',
       userInfo: '',
-      loading: false,
       loginFailedFlag: false,
-      failedInfo: 'aaa',
+      failedInfo: '',
+      loadingInstance: {},
     }
   },
   methods: {
@@ -79,11 +73,26 @@ export default {
         this.$emit('search', this.searchWord)
       }
     },
-    login(evt) {
-      this.loading=false;
+    showModal() {
       this.failedInfo = '';
       this.loginFailedFlag = false;
-      console.log(this.loginFailedFlag);
+      console.log('token:'+this.$store.state.userInfo.token);
+      if (this.$store.state.userInfo.token) {
+        getUserDetail().then(() => {
+          this.$router.push({
+            name: 'admin'
+          })
+        }).catch(error => {
+          console.log(error);
+          this.$refs.modal.show();
+        });
+      } else {
+        this.$refs.modal.show();
+      }
+    },
+    login(evt) {
+      this.failedInfo = '';
+      this.loginFailedFlag = false;
       evt.preventDefault();
       if(!this.username || !this.password) {
         alert("请输入用户名密码！")
@@ -94,18 +103,20 @@ export default {
     handleSubmit () {
       console.log("handleSubmit");
       console.log(this.username, this.password);
-      this.loading = true;
+      this.loadingInstance = Loading.service({ target: '.modal-content', background: 'rgba(0, 0, 0, 0.05)' });
       login({
         username: this.username,
         password: this.password
       }).then((response) => {
         cookie.setCookie('token',response.data.token,7);
+        this.loadingInstance.close();
         console.log(response.data.token);
         this.getUserInfo();
       }).catch(error => {
         console.log(error);
         this.failedInfo = '用户认证失败！';
         this.loginFailedFlag = true;
+        this.loadingInstance.close();
       });
     },
     getUserInfo() {
@@ -124,12 +135,6 @@ export default {
         console.log(error);
       });
     },
-    showModal() {
-      this.loading=false;
-      this.failedInfo = '';
-      this.loginFailedFlag = false;
-      this.$refs.modal.show();
-    }
   },
 }
 </script>
@@ -153,10 +158,10 @@ a {
 .nav-link>a:hover {
   color: $pink;
 }
-.editEntry {
+.adminEntry {
   cursor: pointer;
 }
-.editEntry:hover {
+.adminEntry:hover {
   color: $pink;
 }
 .form-input {

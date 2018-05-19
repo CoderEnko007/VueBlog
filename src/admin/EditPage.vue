@@ -39,7 +39,7 @@
 import InputTag from 'vue-input-tag'
 import VueMarkdown from 'vue-markdown'
 import vueLoading from 'vue-loading-template'
-import {getCategory, postBlogList, getBlogDetail} from "../api/api";
+import {getCategory, postBlog, getBlogDetail, patchBlog} from "../api/api";
 
 export default {
   name: 'EditPage',
@@ -53,7 +53,8 @@ export default {
       article:{
         title: '',
         category: '',
-        tags: [1,2],
+        tags: [3,4],
+        content: '',
         md_content: '',
         md_TOC: ''
       },
@@ -70,12 +71,11 @@ export default {
         "editBlog": 1,
       },
       currentMode: 0,
+      post_id: 0,
+      post_success: true,
     }
   },
   computed: {
-    // getSourceData: function() {
-    //   return this.value;
-    // },
     getResultInfo: function() {
       console.log(this.resultInfo);
       return this.resultInfo;
@@ -86,78 +86,149 @@ export default {
       this.handleSubmit();
     },
     handleSubmit() {
-      console.log(this.article.category)
-      console.log(this.categoryArray)
       for (let index in this.categoryArray) {
         if (this.article.category === this.categoryArray[index].name) {
           this.article.category = this.categoryArray[index].id;
         }
       }
     },
-    handleData(data) {
-      this.md_TOC = data;
-      console.log(data)
-    },
     submitBlog() {
       let MarkdownIt = require('markdown-it');
       let md = new MarkdownIt();
-      this.article.md_content = md.render(this.value);
+      this.article.md_content = this.value;
+      this.article.content = md.render(this.value);
       this.article.md_TOC = this.md_TOC;
+      this.article.tags = [1, 2];
 
       this.submitting = true;
       this.$refs.loadingModal.show();
       console.log(this.article);
-      this.postArticle();
+
+      switch (this.currentMode) {
+        case this.mode.newBlog: {
+          this.postArticle();
+          break;
+        }
+        case this.mode.editBlog: {
+          this.patchArticle();
+          break;
+        }
+      }
     },
     hideModal() {
+      if (this.post_success) {
+        this.$router.push({
+          name: 'listPage',
+        })
+      }
+      this.resultInfo = '';
       this.$refs.loadingModal.hide();
     },
 
     getCategoryList(){
       getCategory().then((response) => {
         this.categoryArray = response.data;
-        this.categoryNameArray = response.data.map((item) => {
-          return item.name;
-        });
-        console.log(this.categoryNameArray)
+        for (let index in this.categoryArray) {
+          if (this.categoryArray.hasOwnProperty(index)) {
+            let dict = {};
+            dict.text = this.categoryArray[index].name;
+            dict.value = this.categoryArray[index].id;
+            this.categoryNameArray.push(dict);
+          }
+        }
+
+        // 通过路由判断是新建博客还是编辑博客
+        switch (this.$route.name) {
+          case 'newPage': {
+            console.log('newPage');
+            this.currentMode = this.mode.newBlog;
+            this.article = [];
+            this.value = '';
+            break;
+          }
+          case 'editPage': {
+            console.log('editPage');
+            this.currentMode = this.mode.editBlog;
+            this.post_id = this.$route.query.id;
+            this.getBlogContent(this.post_id);
+            break;
+          }
+        }
       })
     },
     postArticle() {
-      postBlogList({
+      console.log(this.article)
+      postBlog({
         title: this.article.title,
         tags: this.article.tags,
         category: this.article.category,
-        content: this.article.md_content,
+        content: this.article.content,
+        md_content: this.article.md_content,
       }).then((response) => {
-        this.submitting = false;
-        this.resultInfo = '上传成功！';
+        this.submitDone(true, '上传成功！');
         console.log(response)
       }).catch(error => {
-        this.submitting = false;
-        for (let item in error) {
-          if (error.hasOwnProperty(item)) {
-            this.resultInfo += error[item][0];
-            this.resultInfo += ', ';
-          }
-        }
+        this.handleError(error);
       });
     },
+    patchArticle() {
+      console.log('patchArticle');
+      patchBlog(this.post_id, {
+        title: this.article.title,
+        tags: this.article.tags,
+        category: this.article.category,
+        content: this.article.content,
+        md_content: this.article.md_content,
+      }).then((response) => {
+        this.submitDone(true, '更新成功！');
+        console.log(response)
+      }).catch(error => {
+        this.handleError(error);
+      });
+    },
+    handleError(error) {
+      let info = '';
+      for (let item in error) {
+        if (error.hasOwnProperty(item)) {
+          info += error[item];
+          info += ', ';
+        }
+      }
+      info = info.slice(0, info.length-2);
+      this.submitDone(false, info)
+    },
+    //获取待编辑文章的内容
     getBlogContent(id) {
       getBlogDetail(id).then((response) => {
         let data = response.data;
-        this.value = data.content;
+
+        if (data.md_content) {
+          this.value = data.md_content;
+        } else {
+          this.value = data.content;
+        }
         this.article.title = data.title;
-        this.article.category = data.category;
-        this.article.tags = data.tags;
+        this.article.category = data.category.id;
+        this.article.tags = data.tags.map((item) => {
+          return item.id;
+        })
       })
     },
-
+    submitDone(success, info) {
+      this.submitting = false;
+      this.resultInfo = info;
+      this.post_success = success;
+    }
   },
   mounted() {
     this.getCategoryList();
-    if (this.$route.query.id) {
-      this.currentMode = this.mode.editBlog;
-      this.getBlogContent(this.$route.query.id);
+  },
+  watch: {
+    '$route': function(route) {
+      console.log(route);
+      if (route.name==='newPage') {
+        this.getCategoryList();
+      }
     }
   }
 }

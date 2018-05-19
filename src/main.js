@@ -12,6 +12,10 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'font-awesome/css/font-awesome.css'
 import 'mavon-editor/dist/css/index.css'
+import './assets/css/fontawesome-all.css'
+
+import {MessageBox} from 'element-ui'
+Vue.prototype.$confirm = MessageBox.confirm;
 
 Vue.config.productionTip = false;
 

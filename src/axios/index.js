@@ -18,7 +18,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   response => {
     // console.log('axios response====================>');
-    console.log(response);
+    // console.log(response);
     return response;
   },
   error => {

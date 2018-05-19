@@ -21,6 +21,7 @@
     data () {
       return {
         categorys: [],
+        loading: true,
       }
     },
     methods: {

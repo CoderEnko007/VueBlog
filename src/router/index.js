@@ -6,7 +6,6 @@ import Article from '../components/Article'
 import Admin from '../admin/Admin'
 import EditPage from '../admin/EditPage'
 import ListPage from '../admin/ListPage'
-import SearchPage from '../admin/SearchPage'
 import HelloWorld from '../components/HelloWorld'
 
 Vue.use(Router);
@@ -62,11 +61,11 @@ export default new Router({
       path: '/admin',
       name: 'admin',
       component: Admin,
-      redirect: { name: 'editPage'},
+      redirect: { name: 'listPage'},
       children: [
-        {path: '/admin/editPage', component: EditPage, name: 'editPage'},
         {path: '/admin/listPage', component: ListPage, name: 'listPage'},
-        {path: '/admin/searchPage', component: SearchPage, name: 'searchPage'},
+        {path: '/admin/editPage', component: EditPage, name: 'editPage'},
+        {path: '/admin/newPage', component: EditPage, name: 'newPage'},
       ],
       meta: {
         title: '博客后台',

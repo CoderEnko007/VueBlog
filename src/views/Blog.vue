@@ -53,4 +53,7 @@
 .list-group-item>a:hover {
   color: $pink;
 }
+.container {
+  min-height: 800px;
+}
 </style>

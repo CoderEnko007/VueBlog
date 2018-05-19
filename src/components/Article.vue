@@ -9,7 +9,8 @@
           <span class="small">{{formatCreateDate(time)}}&nbsp&nbsp·&nbsp&nbsp</span>
           <span class="small">{{click_nums}} 阅读</span>
           <hr class="mb-4">
-          <span v-html="content"></span>
+          <!--<span v-html="content"></span>-->
+          <vue-markdown class="markdown-body" :source="content"></vue-markdown>
         </div>
       </div>
       <!--<div class="col-lg-3">-->
@@ -21,11 +22,17 @@
 
 <script>
   import {getBlogDetail} from "../api/api";
+  import VueMarkdown from 'vue-markdown';
+  import { Loading } from 'element-ui';
 
   export default {
     name: 'Article',
+    components: {
+      VueMarkdown
+    },
     data() {
       return {
+        true1: true,
         post: '',
         msg: '目录占楼',
         title: '',
@@ -34,20 +41,13 @@
         click_nums: 0,
         content: '',
         show: false,
-        items: [{
-          text: '',
-          to: ''
-        }, {
-          text: '',
-          to: ''
-        }, {
-          text: '',
-          active: true
-        }]
+        items: [],
+        loadingInstance: {},
       }
     },
     mounted() {
       console.log(this.$route.params);
+      this.loadingInstance = Loading.service({ target:"#blog-list" });
       getBlogDetail(this.$route.params.id)
         .then((response) => {
           this.post = response.data;
@@ -55,7 +55,7 @@
           this.author = this.post.author.nick_name;
           this.time = this.post.create_time;
           this.click_nums = this.post.click_nums;
-          this.content = this.post.content;
+          this.content = this.post.md_content;
 
           this.items = [{
             text: "<i class='fa fa-home'>&nbsp&nbsp首页",
@@ -68,6 +68,7 @@
             active: true
           }];
           this.show = true;
+          this.loadingInstance.close();
       })
     },
     methods: {
@@ -90,7 +91,7 @@
         }
         res = create_time.getFullYear()+'年'+create_time.getMonth()+'月'+create_time.getDay()+'日';
         return res
-      }
+      },
     }
   }
 </script>
@@ -117,5 +118,12 @@ hr {
 }
 .breadcrumb-item + .breadcrumb-item::before {
   content: '>';
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 </style>
