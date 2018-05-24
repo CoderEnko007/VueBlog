@@ -46,12 +46,16 @@
 <style lang="scss" scoped>
 @import '../../scss/custom';
 
+.header {
+  min-width: 1349px;
+}
 .header>h2 {
   height: 80px;
   line-height: 80px;
 }
 .view-body {
   width: 100%;
+  min-width: 1349px;
   position: absolute;
   top: 80px;
   bottom: 0;

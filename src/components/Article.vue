@@ -9,8 +9,8 @@
           <span class="small">{{formatCreateDate(time)}}&nbsp&nbsp·&nbsp&nbsp</span>
           <span class="small">{{click_nums}} 阅读</span>
           <hr class="mb-4">
-          <!--<span v-html="content"></span>-->
-          <vue-markdown class="markdown-body" :source="content"></vue-markdown>
+          <span class="markdown-body" v-html="content"></span>
+          <!--<vue-markdown class="markdown-body" :source="content"></vue-markdown>-->
         </div>
       </div>
       <!--<div class="col-lg-3">-->
@@ -55,7 +55,8 @@
           this.author = this.post.author.nick_name;
           this.time = this.post.create_time;
           this.click_nums = this.post.click_nums;
-          this.content = this.post.md_content;
+          // this.content = this.post.md_content;
+          this.content = this.post.content;
 
           this.items = [{
             text: "<i class='fa fa-home'>&nbsp&nbsp首页",
@@ -119,11 +120,11 @@ hr {
 .breadcrumb-item + .breadcrumb-item::before {
   content: '>';
 }
-.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h1, .markdown-body h2, .markdown-bodyh3,
 .markdown-body h4, .markdown-body h5, .markdown-body h6 {
   margin-top: 24px;
   margin-bottom: 16px;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.25rem;
 }
 </style>

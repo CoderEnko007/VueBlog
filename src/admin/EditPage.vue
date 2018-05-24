@@ -3,11 +3,11 @@
     <b-button variant="outline-secondary" class="mt-2 mb-2" @click="modalShow = !modalShow">添加信息</b-button>
     <b-button variant="outline-secondary" class="mt-2 mb-2 float-right" @click="submitBlog">发&nbsp&nbsp&nbsp&nbsp布</b-button>
     <b-modal v-model="modalShow" title="文章信息" @ok="submitBlogInfo" size="lg" no-close-on-backdrop no-close-on-esc>
-      <form @submit.stop.prevent="handleSubmit">
+      <form @submit.stop.prevent="handleSubmit" id="blogInfoForm" >
         <div class="form-group row">
           <label for="title" class="col-sm-1 col-form-label">标&nbsp&nbsp&nbsp&nbsp题</label>
           <div class="col-sm-11">
-            <input type="text" class="form-control" id="title" placeholder="标题" v-model="article.title">
+            <input type="text" class="form-control" id="title" placeholder="标题" v-model="article.title"/>
           </div>
         </div>
         <div class="form-group row">
@@ -15,37 +15,40 @@
           <div class="col-sm-4">
             <b-form-select :options="categoryNameArray" id="categorys" v-model="article.category"/>
           </div>
-          <b-button variant="info" class="d-inline"><i class="fa fa-plus"></i></b-button>
+          <div class="form-item">
+            <b-button variant="danger" class="d-inline ml-3 mr-3 mb-1" @click="delCategory"><i class="fas fa-minus"></i></b-button>
+            <b-form-input id="new_category" type="text" class="d-inline" v-model="new_category"></b-form-input>
+            <b-button variant="info" class="d-inline ml-3 mr-3 mb-1" @click="addCategory"><i class="fas fa-plus"></i></b-button>
+          </div>
         </div>
         <div class="form-group row">
           <label for="tags" class="col-sm-1 col-form-label">标&nbsp&nbsp&nbsp&nbsp签</label>
           <div class="col-sm-11">
-            <input-tag :tags.sync="tagsArray" addTagOnBlur id="tags"></input-tag>
+            <input-tag :tags.sync="tagsNameArray" addTagOnBlur id="tags"></input-tag>
           </div>
         </div>
       </form>
     </b-modal>
     <b-modal ref="loadingModal" hide-footer title="Loading...">
-      <vue-loading v-if="submitting" type="bars" color="#d9544e" :size="{ width: '50px', height: '50px' }"></vue-loading>
+      <vue-loading v-if="submitting" type="spiningDubbles" color="#d9544e" :size="{ width: '50px', height: '50px' }"></vue-loading>
       <p v-else="!submitting">{{getResultInfo}}</p>
       <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">关 闭</b-btn>
     </b-modal>
-    <mavon-editor ref="editor" v-model="value"/>
+    <mavon-editor ref="editor" v-model="value" @change="getContent"/>
     <!--<vue-markdown :show=false :source="getSourceData" :toc=true :html=false @toc-rendered="handleData"></vue-markdown>-->
   </div>
 </template>
 
 <script>
 import InputTag from 'vue-input-tag'
-import VueMarkdown from 'vue-markdown'
+import { Loading } from 'element-ui';
 import vueLoading from 'vue-loading-template'
-import {getCategory, postBlog, getBlogDetail, patchBlog} from "../api/api";
+import {getCategory, postBlog, getBlogDetail, patchBlog, addCategorys, delCategorys, getTags} from "../api/api";
 
 export default {
   name: 'EditPage',
   components: {
     'input-tag': InputTag,
-    VueMarkdown,
     vueLoading,
   },
   data () {
@@ -56,14 +59,13 @@ export default {
         tags: [3,4],
         content: '',
         md_content: '',
-        md_TOC: ''
       },
       modalShow: false,
       categoryArray: [],
       categoryNameArray: [],
-      tagsArray: ['hello', 'world'],
+      tagsArray: [],
+      tagsNameArray: [],
       value: '',
-      md_TOC: '',
       submitting: true,
       resultInfo: '',
       mode: {
@@ -73,6 +75,8 @@ export default {
       currentMode: 0,
       post_id: 0,
       post_success: true,
+      new_category: '',
+      loadingInstance: null,
     }
   },
   computed: {
@@ -92,13 +96,12 @@ export default {
         }
       }
     },
+    getContent(value, render) {
+      this.article.md_content = value;
+      this.article.content = render;
+    },
     submitBlog() {
-      let MarkdownIt = require('markdown-it');
-      let md = new MarkdownIt();
-      this.article.md_content = this.value;
-      this.article.content = md.render(this.value);
-      this.article.md_TOC = this.md_TOC;
-      this.article.tags = [1, 2];
+      this.article.tags = [];
 
       this.submitting = true;
       this.$refs.loadingModal.show();
@@ -125,7 +128,8 @@ export default {
       this.$refs.loadingModal.hide();
     },
 
-    getCategoryList(){
+    initAdminPageData(){
+      this.categoryNameArray = [];
       getCategory().then((response) => {
         this.categoryArray = response.data;
         for (let index in this.categoryArray) {
@@ -136,6 +140,22 @@ export default {
             this.categoryNameArray.push(dict);
           }
         }
+
+        this.tagsArray = [];
+        this.tagsNameArray = [];
+        getTags().then((response) => {
+          this.tagsArray = response.data;
+          this.tagsNameArray = this.tagsArray.map((item) => {
+            return item.name
+          })
+        }).catch(error => {
+          console.log(error);
+          if(this.loadingInstance) {
+            this.loadingInstance.close();
+            this.loadingInstance = null;
+          }
+        });
+        console.log(this.tagsArray);
 
         // 通过路由判断是新建博客还是编辑博客
         switch (this.$route.name) {
@@ -154,10 +174,21 @@ export default {
             break;
           }
         }
+        if(this.loadingInstance) {
+          this.loadingInstance.close();
+          this.loadingInstance = null;
+        }
+      }).catch((error) => {
+        console.log(error);
+        if(this.loadingInstance) {
+          this.loadingInstance.close();
+          this.loadingInstance = null;
+        }
       })
     },
     postArticle() {
-      console.log(this.article)
+      console.log(this.article);
+      console.log(this.tagsArray);
       postBlog({
         title: this.article.title,
         tags: this.article.tags,
@@ -218,16 +249,39 @@ export default {
       this.submitting = false;
       this.resultInfo = info;
       this.post_success = success;
-    }
+    },
+
+    delCategory() {
+      this.loadingInstance = Loading.service({ target: '.modal-dialog' });
+      delCategorys(this.article.category).then(() => {
+        this.initAdminPageData();
+      }).catch((error) => {
+        this.loadingInstance.close();
+        this.loadingInstance = null;
+        console.log(error);
+      })
+    },
+    addCategory() {
+      this.loadingInstance = Loading.service({ target: '.modal-dialog' });
+      addCategorys({
+        name: this.new_category
+      }).then(() => {
+        this.initAdminPageData();
+      }).catch((error) => {
+        this.loadingInstance.close();
+        this.loadingInstance = null;
+        console.log(error);
+      })
+    },
   },
   mounted() {
-    this.getCategoryList();
+    this.initAdminPageData();
   },
   watch: {
     '$route': function(route) {
       console.log(route);
       if (route.name==='newPage') {
-        this.getCategoryList();
+        this.initAdminPageData();
       }
     }
   }
@@ -237,6 +291,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import '../assets/css/custom';
+@import "../../node_modules/bootstrap/scss/bootstrap";
 
 #main {
   height: 100%;
@@ -258,5 +313,22 @@ input:focus, input:active, select:focus, select:active:focus, #tags:focus {
 #tags {
   border-radius: 0.25rem;
   border: 1px solid #ced4da;
+}
+#new_category {
+  width: 120px;
+}
+.form-item {
+  vertical-align: center;
+}
+
+@include media-breakpoint-down(md) {
+  .form-group label{
+    display: none;
+  }
+}
+@include media-breakpoint-down(sm) {
+  .form-item {
+    margin-top: 16px;
+  }
 }
 </style>

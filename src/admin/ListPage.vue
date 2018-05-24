@@ -3,10 +3,11 @@
     <b-table hover fixed :items="listData" :fields="fields" outlined
              :current-page="currentPage" :per-page="pageSize">
       <template slot="title" slot-scope="data">
-        <b-button size="sm" variant="link" @click="handleEdit(data)">{{data.value}}</b-button>
+        <b-button size="sm" variant="link" :to="{name: 'posts', params: {id:data.item.id}}">{{data.value}}</b-button>
       </template>
       <template slot="operate" slot-scope="data">
         <b-button size="sm" variant="danger" @click="handleDelete(data)">删 除</b-button>
+        <b-button size="sm" variant="secondary" @click="handleEdit(data)">编 辑</b-button>
       </template>
     </b-table>
     <b-pagination
@@ -22,14 +23,12 @@
 </template>
 
 <script>
-  import vueLoading from 'vue-loading-template'
   import { Loading } from 'element-ui';
   import {getAdminList, deleteArticle} from "../api/api";
 
   export default {
     name: 'ListPage',
     components: {
-      vueLoading,
       // 'el-table': Table,
       // 'el-button': Button,
       // 'el-table-column': TableColumn,
@@ -119,7 +118,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #blog-list {
-  height: 100%;
+  min-height: 540px;
   background-color: white;
 }
 .table-td>.btn {
