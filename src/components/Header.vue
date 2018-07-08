@@ -23,48 +23,61 @@
             <b-button variant="outline-primary" size="sm"
                       class="my-2 my-sm-0" type="submit"
                       @click="search" >搜 索</b-button>
-            <div>
-              <i class="adminEntry fas fa-sign-in-alt ml-3" @click="showModal"></i>
-              <b-modal ref="modal" id="loginDialog" v-model="modalShow" title="请登录" @ok="login">
-                <form class="mt-3 mb-3" @submit.stop.prevent="handleSubmit">
-                  <b-form-input class="form-input" v-model="username" placeholder="用户名"></b-form-input>
-                  <b-form-input type="password" class="form-input" v-model="password" placeholder="密码"></b-form-input>
-                  <p v-if="loginFailedFlag">{{getFailedInfo}}</p>
-                </form>
-              </b-modal>
-            </div>
+            <i class="adminEntry fas fa-sign-in-alt ml-3" @click="handleLogin"></i>
           </b-nav-form>
         </b-navbar-nav>
       </b-collapse>
+
+      <el-dialog class="login-dialog" title="登陆后台" :visible.sync="dialogVisible" width="30%">
+        <el-form class="login-form" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
+          <el-form-item prop="username">
+            <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="用户名" />
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input name="password" type="password" @keyup.enter.native="LoginSubmit" v-model="loginForm.password" autoComplete="on"
+                      placeholder="密码"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="LoginSubmit">
+              登 陆
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
     </b-navbar>
   </div>
 </template>
 
 <script>
-import {login, getUserDetail} from "../api/api";
-import cookie from '../assets/js/cookie'
-import { Loading } from 'element-ui'
+import { mapGetters } from 'vuex'
+import { Message } from 'element-ui'
 
 export default {
   name: 'Header',
-  computed: {
-    getFailedInfo: function() {
-      console.log(this.failedInfo)
-      return this.failedInfo;
-    }
-  },
   data () {
     return {
+      loading: false,
+      dialogVisible: false,
+      loginForm: {
+        username: '',
+        password: ''
+      },
+      loginRules: {
+        username: [{ required: true, message: '请填写用户名', trigger: 'blur' }],
+        password: [
+          { required: true, message: '请填写密码', trigger: 'blur' },
+          {min: 6, message: '密码不能少于6位', trigger: 'blur'}
+        ]
+      },
       title: "袁方的博客",
       searchWord:'',
-      modalShow: false,
-      username: '',
-      password: '',
-      userInfo: '',
-      loginFailedFlag: false,
-      failedInfo: '',
-      loadingInstance: {},
     }
+  },
+  computed: {
+    // 使用对象展开运算符将 getter 混入 computed 对象中
+    ...mapGetters([
+      'token'
+    ])
   },
   methods: {
     search(evt) {
@@ -73,68 +86,42 @@ export default {
         this.$emit('search', this.searchWord)
       }
     },
-    showModal() {
-      this.failedInfo = '';
-      this.loginFailedFlag = false;
-      console.log('token:'+this.$store.state.userInfo.token);
-      if (this.$store.state.userInfo.token) {
-        getUserDetail().then(() => {
-          this.$router.push({
-            name: 'admin'
-          })
-        }).catch(error => {
-          console.log(error);
-          this.$refs.modal.show();
-        });
-      } else {
-        this.$refs.modal.show();
+    resetFormData() {
+      this.loginForm = {
+        username: '',
+          password: ''
       }
     },
-    login(evt) {
-      this.failedInfo = '';
-      this.loginFailedFlag = false;
-      evt.preventDefault();
-      if(!this.username || !this.password) {
-        alert("请输入用户名密码！")
+    handleLogin() {
+      if (this.token) {
+        this.$router.push({ name: 'admin'})
       } else {
-        this.handleSubmit();
-      }
-    },
-    handleSubmit () {
-      console.log("handleSubmit");
-      console.log(this.username, this.password);
-      this.loadingInstance = Loading.service({ target: '.modal-content', background: 'rgba(0, 0, 0, 0.05)' });
-      login({
-        username: this.username,
-        password: this.password
-      }).then((response) => {
-        cookie.setCookie('token',response.data.token,7);
-        this.loadingInstance.close();
-        console.log(response.data.token);
-        this.getUserInfo();
-      }).catch(error => {
-        console.log(error);
-        this.failedInfo = '用户认证失败！';
-        this.loginFailedFlag = true;
-        this.loadingInstance.close();
-      });
-    },
-    getUserInfo() {
-      getUserDetail().then((response) => {
-        console.log(response);
-        this.userInfo = response.data;
-        cookie.setCookie('name', this.userInfo.name);
-        this.$store.dispatch('setInfo');
-        console.log('getUserInfo router to admin');
-        this.$router.push({
-          name: 'admin'
+        this.resetFormData()
+        this.dialogVisible = true
+        this.$nextTick(() => {
+          this.$refs['loginForm'].clearValidate()
         })
-      }).catch(error => {
-        this.failedInfo = '用户数据获取失败！';
-        this.loginFailedFlag = true;
-        console.log(error);
-      });
+      }
     },
+    LoginSubmit() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.$store.dispatch('Login', this.loginForm).then(res => {
+            this.loading = false
+            this.$router.push({ name: 'admin'})
+          }).catch(err => {
+            this.loading = false
+            Message({
+              message: '用户名或密码错误',
+              type: 'error',
+              duration: 2000
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    }
   },
 }
 </script>
@@ -142,6 +129,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import '../assets/css/custom';
+$dark_gray:#889aa4;
 a {
   color: inherit;
   text-decoration: none;
@@ -169,5 +157,4 @@ a {
   width: 100%;
   margin-bottom: 12px;
 }
-
 </style>

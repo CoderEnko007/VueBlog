@@ -3,9 +3,10 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import store from './store/store'
+import store from './store'
 import BootstrapVue from 'bootstrap-vue'
 import mavonEditor from 'mavon-editor'
+import './router/permission'
 
 import './axios'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -14,8 +15,53 @@ import 'font-awesome/css/font-awesome.css'
 import 'mavon-editor/dist/css/index.css'
 import './assets/css/fontawesome-all.css'
 
-import {MessageBox} from 'element-ui'
+import {
+  Button,
+  Dialog,
+  Form,
+  FormItem,
+  Input,
+  Menu,
+  Submenu,
+  MenuItem,
+  Tooltip,
+  Table,
+  TableColumn,
+  Pagination,
+  Select,
+  Option,
+  Row,
+  Col,
+
+  Message,
+  MessageBox,
+  Loading,
+  Notification
+} from 'element-ui'
+Vue.use(Button);
+Vue.use(Dialog);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Input);
+Vue.use(Menu);
+Vue.use(Submenu);
+Vue.use(MenuItem);
+Vue.use(Tooltip);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(Pagination);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(Row);
+Vue.use(Col);
+
+Vue.prototype.$loading = Loading.service;
+Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$alert = MessageBox.alert;
 Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$prompt = MessageBox.prompt;
+Vue.prototype.$notify = Notification;
+Vue.prototype.$message = Message;
 
 Vue.config.productionTip = false;
 

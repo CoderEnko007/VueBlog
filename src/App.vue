@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -20,6 +20,9 @@ html, body, #app {height: 100%;}
 body {
   background-color: $bgcolor;
 }
+a {
+  text-decoration: none!important;
+}
 
 .btn:focus, .btn.focus, .btn:active:focus,
 .btn:active.focus, .btn.active:focus,
@@ -30,5 +33,6 @@ select:focus, select:active:focus {
 }
 * {
   box-sizing: border-box;
+  outline: none;
 }
 </style>

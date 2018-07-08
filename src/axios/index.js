@@ -1,12 +1,21 @@
 import axios from 'axios';
-import store from '../store/store';
+import store from '../store';
+import { getToken } from '@/utils/auth'
+import { Message, MessageBox } from 'element-ui'
 
-axios.interceptors.request.use(
+const host = 'http://127.0.0.1:8000';
+
+const service = axios.create({
+  baseURL: host, // api的base_url
+  timeout: 5000 // 请求超时时间
+})
+
+service.interceptors.request.use(
   config => {
     // console.log('axios request====================>');
     // console.log(config);
-    if (store.state.userInfo.token) {
-      config.headers.Authorization = `JWT ${store.state.userInfo.token}`;
+    if (store.getters.token) {
+      config.headers.Authorization = `JWT ${getToken()}`;
     }
     return config;
   },
@@ -15,15 +24,17 @@ axios.interceptors.request.use(
   }
 );
 
-axios.interceptors.response.use(
+service.interceptors.response.use(
   response => {
     // console.log('axios response====================>');
     // console.log(response);
+    const res = response.data
     return response;
   },
   error => {
     let res = error.response;
-    console.log(res.status);
-    return Promise.reject(error.response.data)
+    return Promise.reject(res.data)
   }
 );
+
+export default service

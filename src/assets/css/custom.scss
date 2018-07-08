@@ -4,6 +4,16 @@ $pink-shadow:rgba(242, 93, 142, 0.25);
 $blue:#7DC6F0;
 $meta-word:#3E3E3E;
 
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
 .block {
   background-color: #fff;
 }
@@ -16,3 +26,26 @@ $meta-word:#3E3E3E;
 .title {
   color: $meta-word;
 }
+.markdown-body {
+  z-index: 1;
+}
+
+.app-container {
+  padding: 10px 20px;
+  min-height: 100%;
+  background-color: white;
+  .filter-container {
+    position: relative;
+    height: 60px;
+    box-sizing: border-box;
+    margin: 0 0 5px;
+    padding: 0;
+    .filter {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+

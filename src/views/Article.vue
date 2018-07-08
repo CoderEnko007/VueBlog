@@ -24,6 +24,7 @@
   import {getBlogDetail} from "../api/api";
   import VueMarkdown from 'vue-markdown';
   import { Loading } from 'element-ui';
+  import {formatPostCreateDate} from "../utils";
 
   export default {
     name: 'Article',
@@ -59,11 +60,11 @@
           this.content = this.post.content;
 
           this.items = [{
-            text: "<i class='fa fa-home'>&nbsp&nbsp首页",
+            text: "首页",
             to: '/'
           }, {
             text: this.post.category.name,
-            to: {name:'category', params:{category:this.post.category.id, showCategory:true}}
+            to: {name:'category', params:{category:this.post.category.id}}
           }, {
             text: this.title,
             active: true
@@ -74,24 +75,7 @@
     },
     methods: {
       formatCreateDate(date) {
-        let create_time = new Date(date);
-        let now = new Date().getTime();
-        let day = Math.abs(now-create_time.getTime());
-        let res = new Date(day).getDate()-1;
-
-        switch (res) {
-          case 0: res = '今天发布'; break;
-          case 1: res = '昨天发布'; break;
-          case 2: res = '前天发布'; break;
-          default:
-            if(res <= 7) {
-              res = res + '天前发布'
-            } else {
-              res = create_time.getFullYear()+'年'+create_time.getMonth()+'月'+create_time.getDay()+'日';
-            }
-        }
-        res = create_time.getFullYear()+'年'+create_time.getMonth()+'月'+create_time.getDay()+'日';
-        return res
+        return formatPostCreateDate(date)
       },
     }
   }
@@ -126,5 +110,8 @@ hr {
   margin-bottom: 16px;
   font-weight: 600;
   line-height: 1.25rem;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  content: '/'
 }
 </style>

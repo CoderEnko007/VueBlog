@@ -3,7 +3,9 @@
     <blog-header v-on:search="doingSearch"/>
     <div id="main" class="mt-4">
       <div class="container">
-        <router-view></router-view>
+        <transition name="fade" mode="out-in">
+          <router-view :key="key"></router-view>
+        </transition>
       </div>
     </div>
     <blog-footer/>
@@ -12,7 +14,7 @@
 
 <script>
   import Header from '../components/Header'
-  import BlogList from '../components/BlogList'
+  import BlogList from './BlogList'
   import Footer from '../components/Footer'
 
   export default {
@@ -22,22 +24,20 @@
       'blogList': BlogList,
       'blogFooter': Footer,
     },
-    data () {
-      return {
-        searchWord: '',
+    computed: {
+      key() {
+        return this.$route.name !== undefined? this.$route.name + +new Date(): this.$route + +new Date()
       }
     },
     methods: {
       doingSearch(word) {
-        this.searchWord = word;
-        if(this.searchWord) {
-          console.log('doingSearch');
+        this.$store.dispatch('SetSearchWord', word).then(() => {
           this.$router.push({
             name: 'search',
-            params: { keyword: this.searchWord }
+            params: { keyword: word }
           });
-        }
-      },
+        })
+      }
     },
   }
 </script>
