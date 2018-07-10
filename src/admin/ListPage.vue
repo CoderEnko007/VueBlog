@@ -134,7 +134,7 @@
       },
       handleCreate() {
         this.$router.push({
-          name: 'newPage',
+          name: 'createPage',
         })
       },
       handleDelete(id) {

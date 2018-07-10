@@ -13,8 +13,9 @@ export default {
 <style lang="scss">
 @import '../scss/custom.scss';
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
-body,div,ol,ul,li,dl,dt,dd,h1,h2,h3,h4,h5,h6,p,form,fieldset,legend,input{ margin:0; padding:0;}
+body,div,h1,h2,h3,h4,h5,h6,p,form,fieldset,legend,input{ margin:0; padding:0;}
 ol,ul{ list-style:none;}
+ul {padding-left: 10px;}
 img,fieldset{ border:0 none; display:block;}
 html, body, #app {height: 100%;}
 body {

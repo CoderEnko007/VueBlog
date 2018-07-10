@@ -9,6 +9,7 @@
       </div>
     </div>
     <blog-footer/>
+    <BackTop></BackTop>
   </div>
 </template>
 
@@ -16,6 +17,7 @@
   import Header from '../components/Header'
   import BlogList from './BlogList'
   import Footer from '../components/Footer'
+  import BackTop from '../components/BackTop'
 
   export default {
     name: 'Blog',
@@ -23,6 +25,7 @@
       'blogHeader': Header,
       'blogList': BlogList,
       'blogFooter': Footer,
+      BackTop
     },
     computed: {
       key() {
@@ -45,7 +48,9 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import '../../scss/custom';
-
+#main {
+  margin-top: 70px!important;
+}
 .list-group-item>a {
   color: $meta-word;
   text-decoration: none;

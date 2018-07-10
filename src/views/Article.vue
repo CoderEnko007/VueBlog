@@ -13,9 +13,13 @@
           <!--<vue-markdown class="markdown-body" :source="content"></vue-markdown>-->
         </div>
       </div>
-      <!--<div class="col-lg-3">-->
-          <!--{{msg}}-->
-      <!--</div>-->
+
+      <div class="col-lg-3 ">
+        <div class="toc-title">目录</div>
+        <div class="toc-placeholder bg-white">
+          {{msg}}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,6 +29,7 @@
   import VueMarkdown from 'vue-markdown';
   import { Loading } from 'element-ui';
   import {formatPostCreateDate} from "../utils";
+  import autoToc from 'auto-toc'
 
   export default {
     name: 'Article',
@@ -47,7 +52,6 @@
       }
     },
     mounted() {
-      console.log(this.$route.params);
       this.loadingInstance = Loading.service({ target:"#blog-list" });
       getBlogDetail(this.$route.params.id)
         .then((response) => {
@@ -71,10 +75,15 @@
           }];
           this.show = true;
           this.loadingInstance.close();
+          this.$nextTick(() => {
+            autoToc('.markdown-body', '.toc-placeholder', {});
+          })
       })
+
     },
     methods: {
       formatCreateDate(date) {
+        console.log('formatCreateDate',date)
         return formatPostCreateDate(date)
       },
     }
@@ -114,4 +123,13 @@ hr {
 .breadcrumb-item + .breadcrumb-item::before {
   content: '/'
 }
+.toc-title {
+  padding: 10px 15px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+}
+.toc-placeholder {
+  padding: 15px;
+}
+
 </style>

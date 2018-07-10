@@ -130,6 +130,12 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/css/custom';
 $dark_gray:#889aa4;
+#header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
 a {
   color: inherit;
   text-decoration: none;

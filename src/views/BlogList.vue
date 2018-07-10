@@ -119,6 +119,7 @@
     },
 
     mounted() {
+      console.log(this.$router)
       if (this.$route.name === 'index') {
         this.$store.dispatch('ResetQueryList').then(() => {
           this.fetchData()

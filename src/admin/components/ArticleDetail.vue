@@ -100,6 +100,15 @@
       submitForm() {
         this.$refs['postForm'].validate((valid) => {
           if (valid) {
+            if (this.postForm.md_content.length <= 0) {
+              this.$notify({
+                title: '警告',
+                message: '文章内容不能为空',
+                type: 'warning',
+                duration: 2000
+              })
+              return
+            }
             if (this.isEdit) {
               const id = this.postForm.id
               patchBlog(id, this.postForm).then(res => {
@@ -119,6 +128,7 @@
                 })
               })
             } else {
+              console.log(this.postForm)
               postBlog(this.postForm).then(res => {
                 this.$notify({
                   title: '成功',
@@ -156,7 +166,7 @@
         getBlogDetail(id).then(res => {
           this.postForm = res.data
           this.postForm.tags = res.data.tags.map(v => {
-            return v.id
+            return v.name
           })
           this.postForm.category = res.data.category.id
           if (!this.postForm.md_content) {

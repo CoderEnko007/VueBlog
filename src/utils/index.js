@@ -9,10 +9,12 @@ export function generateSummary(content) {
 }
 
 export function formatPostCreateDate(date) {
+  console.log(date)
   let create_time = new Date(date);
   let now = new Date().getTime();
   let day = Math.abs(now-create_time.getTime());
-  let res = day / 1000 / 3600 / 24;
+  let res = Math.floor(day / 1000 / 3600 / 24);
+  console.log(day, res)
 
   switch (res) {
     case 0: res = '今天发布'; break;
