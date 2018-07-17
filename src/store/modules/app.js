@@ -27,7 +27,7 @@ const app = {
     },
     SET_TAG: (state, tag_id) => {
       state.listQuery = Object.assign({}, defaultList)
-      state.listQuery.tag = tag_id
+      state.listQuery.tags = tag_id
     },
     SET_ORDERING: (state, ordering) => {
       state.listQuery = Object.assign({}, defaultList)

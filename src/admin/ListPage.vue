@@ -29,7 +29,7 @@
       </el-table-column>
       <el-table-column width="150" align="left" label="文章分类" >
         <template slot-scope="scope">
-          <span>{{scope.row.category}}</span>
+          <span>{{scope.row.category.name}}</span>
         </template>
       </el-table-column>
       <el-table-column width="150" align="left" label="文章标签" >

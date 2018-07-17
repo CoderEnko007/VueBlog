@@ -4,20 +4,20 @@
       <div class="col-lg-9">
         <b-breadcrumb class="bg-white mb-2" :items="items"/>
         <div class="bg-white mb-1 mb-sm-2 p-2 p-lg-3">
-          <h2 class="title mb-3 text-primary">{{title}}</h2>
+          <h2 class="title mb-3 text-primary" @click="test">{{title}}</h2>
           <span class="small ml-3">作者 {{author}}&nbsp&nbsp·&nbsp&nbsp</span>
           <span class="small">{{formatCreateDate(time)}}&nbsp&nbsp·&nbsp&nbsp</span>
           <span class="small">{{click_nums}} 阅读</span>
           <hr class="mb-4">
-          <span class="markdown-body" v-html="content"></span>
-          <!--<vue-markdown class="markdown-body" :source="content"></vue-markdown>-->
+          <span class="markdown-body" v-html="content" ref="article"></span>
         </div>
       </div>
 
-      <div class="col-lg-3 ">
-        <div class="toc-title">目录</div>
-        <div class="toc-placeholder bg-white">
-          {{msg}}
+      <div class="col-lg-3">
+        <div class="toc-container" ref="toc">
+          <div class="toc-title">目录</div>
+          <div class="toc-placeholder bg-white">
+          </div>
         </div>
       </div>
     </div>
@@ -26,21 +26,16 @@
 
 <script>
   import {getBlogDetail} from "../api/api";
-  import VueMarkdown from 'vue-markdown';
   import { Loading } from 'element-ui';
   import {formatPostCreateDate} from "../utils";
   import autoToc from 'auto-toc'
 
   export default {
     name: 'Article',
-    components: {
-      VueMarkdown
-    },
     data() {
       return {
         true1: true,
         post: '',
-        msg: '目录占楼',
         title: '',
         author: '',
         time: '',
@@ -69,6 +64,7 @@
           }, {
             text: this.post.category.name,
             to: {name:'category', params:{category:this.post.category.id}}
+            // href: '/category/'+this.post.category.id
           }, {
             text: this.title,
             active: true
@@ -76,16 +72,50 @@
           this.show = true;
           this.loadingInstance.close();
           this.$nextTick(() => {
+            this.generateAnchor(this.$refs.article)
             autoToc('.markdown-body', '.toc-placeholder', {});
           })
       })
 
+      window.addEventListener('scroll', this.scrollPage)
+    },
+    destroyed () {
+      window.removeEventListener('scroll', this.scrollPage);
     },
     methods: {
       formatCreateDate(date) {
-        console.log('formatCreateDate',date)
         return formatPostCreateDate(date)
       },
+      scrollPage() {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop >= 56) {
+          this.$refs.toc.style.top = scrollTop-56+'px'
+        } else {
+          this.$refs.toc.style.top = 0
+        }
+      },
+      // 查找文章中的h标签，并添加id
+      generateAnchor(contentRef) {
+        let nodes = contentRef.children
+        let nodeId = 0
+        if (nodes.length) {
+          for (let i = 0; i < nodes.length; i++) {
+            judageH(nodes[i] , i , nodes)
+            function judageH(node , i , nodes) {
+              let reg = /^H[1-6]{1}$/;
+              if (reg.exec(node.tagName)) {
+                nodes[i].setAttribute("id", '_'+nodeId++)
+              }
+            }
+          }
+        }
+      },
+      test() {
+        this.$router.push({
+          name: 'category',
+          params: { category: 1 }
+        });
+      }
     }
   }
 </script>
@@ -113,23 +143,29 @@ hr {
 .breadcrumb-item + .breadcrumb-item::before {
   content: '>';
 }
-.markdown-body h1, .markdown-body h2, .markdown-bodyh3,
-.markdown-body h4, .markdown-body h5, .markdown-body h6 {
-  margin-top: 24px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  line-height: 1.25rem;
-}
 .breadcrumb-item + .breadcrumb-item::before {
   content: '/'
 }
-.toc-title {
-  padding: 10px 15px;
-  background-color: white;
-  border-bottom: 1px solid #eee;
+.toc-container {
+  position: absolute;
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.8;
+  .toc-title {
+    padding: 10px 15px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+  }
+  .toc-placeholder {
+    padding: 15px;
+    a {
+      overflow: hidden!important;
+      text-overflow:ellipsis!important;
+      white-space: nowrap!important;
+      display: block!important;
+    }
+  }
 }
-.toc-placeholder {
-  padding: 15px;
-}
+
 
 </style>

@@ -10,13 +10,15 @@
 
       <b-collapse is-nav id="nav_collapse">
 
-        <b-navbar-nav class="ml-auto mr-5">
-          <b-nav-item class="mr-4" to="/">
-            <a class="nav-item"><i class="fa fa-home mr-2"></i>首&nbsp&nbsp&nbsp&nbsp页</a>
+        <b-navbar-nav class="ml-auto mr-4">
+          <b-nav-item class="mr-3" to="/">
+            <a :class="{active: $route.name === 'list'}"><i class="fa fa-home mr-2"></i>首&nbsp&nbsp页</a>
           </b-nav-item>
-          <b-nav-item href="#" class="mr-4"><a class="nav-item">归&nbsp&nbsp&nbsp&nbsp档</a></b-nav-item>
-          <b-nav-item class="mr-5" to="/helloworld">
-              <a class="nav-item">关&nbsp&nbsp&nbsp&nbsp于</a>
+          <b-nav-item href="#" class="mr-3" to="/archive">
+            <a :class="{active: $route.name === 'archive'}">归&nbsp&nbsp档</a>
+          </b-nav-item>
+          <b-nav-item class="mr-4" to="/about">
+              <a :class="{active: $route.name === 'about'}">关&nbsp&nbsp于</a>
           </b-nav-item>
           <b-nav-form>
             <b-form-input size="sm" class="mr-sm-2 search-input" type="text" v-model="searchWord" placeholder="Search"/>
@@ -106,6 +108,7 @@ export default {
     LoginSubmit() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          this.loading = true
           this.$store.dispatch('Login', this.loginForm).then(res => {
             this.loading = false
             this.$router.push({ name: 'admin'})
@@ -123,6 +126,14 @@ export default {
       })
     }
   },
+  // watch: {
+  //   '$route': function (route) {
+  //     console.log(route.name)
+  //     if (route.name === 'index') {
+  //       this.isActive = true
+  //     }
+  //   }
+  // }
 }
 </script>
 
@@ -131,10 +142,10 @@ export default {
 @import '../assets/css/custom';
 $dark_gray:#889aa4;
 #header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1;
+  /*position: fixed;*/
+  /*top: 0;*/
+  /*width: 100%;*/
+  /*z-index: 1;*/
 }
 a {
   color: inherit;

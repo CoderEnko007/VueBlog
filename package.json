@@ -17,6 +17,7 @@
     "element-ui": "^2.3.8",
     "js-cookie": "^2.2.0",
     "mavon-editor": "^2.6.3",
+    "npm": "^6.1.0",
     "sass-loader": "^7.0.1",
     "vue": "^2.5.2",
     "vue-axios": "^2.1.1",
@@ -25,6 +26,7 @@
     "vue-loading-template": "^0.1.7",
     "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1",
+    "vue-tag-cloud": "0.0.1",
     "vue-tagsinput": "^2.0.1",
     "vuex": "^3.0.1"
   },

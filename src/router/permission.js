@@ -3,7 +3,7 @@ import store from '../store'
 import { Message } from 'element-ui'
 import { getToken } from '@/utils/auth'
 
-const whiteList = ['index', 'posts', 'search', 'category']
+const whiteList = ['index', 'posts', 'search', 'category', 'tags', 'HelloWorld', 'list', 'archive', 'about']
 router.beforeEach((to, from, next) => {
   if (getToken()) {
     if (store.getters.roles.length === 0) {
@@ -19,7 +19,8 @@ router.beforeEach((to, from, next) => {
       next()
     }
   } else {
-    if (whiteList.indexOf(to.name) !== -1) {
+    // if (whiteList.indexOf(to.name) !== -1) {
+    if (!to.meta.need_log) {
       next()
     } else {
       Message.error('需要登录才能访问')

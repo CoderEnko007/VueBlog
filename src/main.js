@@ -14,6 +14,8 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'font-awesome/css/font-awesome.css'
 import 'mavon-editor/dist/css/index.css'
 import './assets/css/fontawesome-all.css'
+import '../node_modules/mavon-editor/resources/markdown/github-markdown.min.css'
+import 'element-ui/lib/theme-chalk/display.css';
 
 import {
   Button,
@@ -32,6 +34,9 @@ import {
   Option,
   Row,
   Col,
+  Card,
+  Tag,
+  badge,
 
   Message,
   MessageBox,
@@ -54,6 +59,9 @@ Vue.use(Select);
 Vue.use(Option);
 Vue.use(Row);
 Vue.use(Col);
+Vue.use(Card);
+Vue.use(Tag);
+Vue.use(badge);
 
 Vue.prototype.$loading = Loading.service;
 Vue.prototype.$msgbox = MessageBox;
